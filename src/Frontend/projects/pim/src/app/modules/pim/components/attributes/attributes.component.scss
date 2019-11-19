@@ -1,0 +1,95 @@
+@import '~@angular/material/_theming.scss';
+@import 'projects/pim/src/pim-colors.scss';
+
+:host {
+    position: relative;
+    flex: 1;
+    height: 100%;
+    display: flex;
+}
+
+.attributes-form {
+    padding: 20px;
+    width: 800px;
+    display: flex;
+
+    .mat-accordion {
+        width: 100%;
+    }
+
+    .mat-expansion-panel-header {
+        background-color: map-get($pim-accent, 50);
+
+        .mat-expansion-panel-header-title {
+            color: map-get($pim-primary, 500);
+        }
+    }
+
+    .attribute {
+        display: flex;
+
+        .required-star {
+            display: inline;
+            margin-left: 10px;
+            font-size: 16px;
+            color: map-get($pim-warn, 800);
+
+            &.required-filled {
+                color: map-get($pim-primary, 500);
+            }
+        }
+
+        .name {
+            align-self: center;
+            width: 200px;
+            padding-right: 20px;
+        }
+
+        .value {
+            flex: 1;
+
+            .mat-form-field {
+                &.textarea {
+                    width: calc(100% - 140px);
+                }
+
+                &.number, &.string, &.select, &.date {
+                    width: 50%;
+                }
+
+                .mat-hint {
+                    font-size: 12px;
+                    font-weight: 400;
+                    color: map-get($pim-warn, 300);
+
+                    span {
+                        padding-left: 10px;
+
+                        &.hint-current {
+                            color: map-get($pim-primary, 500);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .hide-expand-buttons {
+        transition: 200ms;
+        width: 50px;
+        height: 50px;
+        background: map-get($pim-accent, 50);
+        margin-left: 10px;
+
+        .mat-icon {
+            font-size: 28px;
+            width: 28px;
+            height: 28px;
+            line-height: 28px;
+        }
+
+        &:hover:not(:disabled) {
+            background: map-get($pim-accent, 100);
+        }
+    }
+}

@@ -1,0 +1,193 @@
+stages:
+  - lint
+  - build
+  - test
+  - assemble
+  - deploy
+
+variables: {
+    STAGING_IP: 'ipololo',
+    STAGING_USER: 'test'
+  }
+
+# ==========================================| LINT-STAGE |=========================================== #
+
+Lint Frontend:
+  stage: lint
+  image: node:10.15.3
+  before_script:
+    - cd src/Frontend 
+    - npm install --loglevel error --progress false --depth -1
+  script:
+    - ./node_modules/@angular/cli/bin/ng lint core 
+    - ./node_modules/@angular/cli/bin/ng lint auth 
+    - ./node_modules/@angular/cli/bin/ng lint calc 
+    - ./node_modules/@angular/cli/bin/ng lint seasons
+    - ./node_modules/@angular/cli/bin/ng lint pim
+
+# ==========================================| BUILD-STAGE |=========================================== #
+
+.Build Backend |TEMPLATE|: &build_backend_tmpl
+  stage: build
+  image: microsoft/dotnet:latest
+  before_script:
+    - cd src/Backend
+  script:
+    - dotnet publish -c ${CONFIGURATION} -r centos.7-x64 -o ../../publish/${CONFIGURATION}/Pim Microservices/Pim/Pim.csproj 
+    - dotnet publish -c ${CONFIGURATION} -r centos.7-x64 -o ../../publish/${CONFIGURATION}/Seasons Microservices/Seasons/Seasons.csproj
+    - dotnet publish -c ${CONFIGURATION} -r centos.7-x64 -o ../../publish/${CONFIGURATION}/Calculator Microservices/Calculator/Calculator.csproj 
+    - dotnet publish -c ${CONFIGURATION} -r centos.7-x64 -o ../../publish/${CONFIGURATION}/Deals Microservices/Deals/Deals.csproj 
+    - dotnet publish -c ${CONFIGURATION} -r centos.7-x64 -o ../../publish/${CONFIGURATION}/FileStorage Microservices/FileStorage/FileStorage.csproj 
+    - dotnet publish -c ${CONFIGURATION} -r centos.7-x64 -o ../../publish/${CONFIGURATION}/WebApi Web/WebApi/WebApi.csproj 
+    - dotnet publish -c ${CONFIGURATION} -r centos.7-x64 -o ../../publish/${CONFIGURATION}/Web1cApi Web/Web1cApi/Web1cApi.csproj 
+  artifacts:
+    paths:
+      - src/Backend/publish/
+    name: "Backend_${CI_COMMIT_REF_SLUG:-$CI_BUILD_REF_SLUG}"
+    expire_in: 1 day
+
+Build Backend [DEBUG]:
+  variables:
+      CONFIGURATION: Debug
+  <<: *build_backend_tmpl
+
+Build Backend [RELEASE]:
+  variables:
+      CONFIGURATION: Release
+  <<: *build_backend_tmpl
+  only:
+    - master
+    - develop
+    - tags
+
+.Build Frontend |TEMPLATE|: &build_frontend_tmpl
+  stage: build
+  image: node:10.15.3
+  artifacts:
+    name: "IS_Frontend_${CI_COMMIT_REF_SLUG:-$CI_BUILD_REF_SLUG}"
+    expire_in: 1 day
+    paths:
+      - src/Frontend/dist
+  cache:
+    paths:
+    - src/Frontend/node_modules/
+  before_script:
+    - cd src/Frontend 
+    - npm install --loglevel error --progress false --depth -1
+    - ./node_modules/@angular/cli/bin/ng build core
+
+Build Frontend [STAGING]:
+  <<: *build_frontend_tmpl
+  script:
+    - ./node_modules/@angular/cli/bin/ng build auth --prod --configuration=stag  --outputPath dist/staging/auth
+    - ./node_modules/@angular/cli/bin/ng build pim --prod --configuration=stag  --outputPath dist/staging/pim
+    - ./node_modules/@angular/cli/bin/ng build calc --prod --configuration=stag  --outputPath dist/staging/calc
+    - ./node_modules/@angular/cli/bin/ng build seasons --prod --configuration=stag  --outputPath dist/staging/seasons
+    
+Build Frontend [PRODUCTION]:
+  <<: *build_frontend_tmpl
+  script:
+    - ./node_modules/@angular/cli/bin/ng build auth --prod --configuration=production --outputPath dist/production/auth
+    - ./node_modules/@angular/cli/bin/ng build pim --prod --configuration=production  --outputPath dist/production/pim
+    - ./node_modules/@angular/cli/bin/ng build calc --prod --configuration=production  --outputPath dist/production/calc
+    - ./node_modules/@angular/cli/bin/ng build seasons --prod --configuration=production  --outputPath dist/production/seasons
+  only:
+    - master
+    - develop
+    - tags
+
+# ===========================================| TEST-STAGE |=========================================== #
+
+Test Frontend:
+  stage: test
+  image: node:10.15.3
+  before_script:
+    - cd src/Frontend 
+    - npm install --loglevel error --progress false --depth -1
+  script:
+    - ./node_modules/@angular/cli/bin/ng test core --browsers PhantomJS --watch=false
+    - ./node_modules/@angular/cli/bin/ng test auth --browsers PhantomJS --watch=false
+    - ./node_modules/@angular/cli/bin/ng test calc --browsers PhantomJS --watch=false
+    - ./node_modules/@angular/cli/bin/ng test seasons --browsers PhantomJS --watch=false
+    - ./node_modules/@angular/cli/bin/ng test pim --browsers PhantomJS --watch=false
+
+# ==========================================| ASSEMBLE-STAGE |========================================== #
+
+Assemble [STAGING]:
+  stage: assemble
+  dependencies:
+    - Build Backend [DEBUG]
+    - Build Frontend [STAGING]
+  script: 
+    - mkdir -p src/Backend/publish/Debug/WebApi/wwwroot
+    - cp -r src/Frontend/dist/staging/* src/Backend/publish/Debug/WebApi/wwwroot/
+    - cp -r src/Frontend/dist/core src/Backend/publish/Debug/WebApi/wwwroot/
+  artifacts:
+    paths:
+      - src/Backend/publish/Debug
+    name: "Assemble_${CI_COMMIT_REF_SLUG:-$CI_BUILD_REF_SLUG}"
+    expire_in: 1 day
+
+Assemble [PRODUCTION]:
+  stage: assemble
+  dependencies:
+    - Build Backend [RELEASE]
+    - Build Frontend [PRODUCTION]
+  script: 
+    - mkdir -p src/Backend/publish/Release/WebApi/wwwroot
+    - cp -r src/Frontend/dist/production/* src/Backend/publish/Release/WebApi/wwwroot/
+    - cp -r src/Frontend/dist/core src/Backend/publish/Release/WebApi/wwwroot/
+  only:
+    - master
+    - tags
+  artifacts:
+    paths:
+      - src/Backend/publish/Release
+    name: "Assemble_${CI_COMMIT_REF_SLUG:-$CI_BUILD_REF_SLUG}"
+    expire_in: 1 year
+  
+# ===========================================| DEPLOY-STAGE |========================================== #
+
+Deploy [STAGING]:
+  image: centos:7
+  stage: deploy
+  dependencies:
+    - Assemble [STAGING]
+  before_script: 
+    # See: https://docs.gitlab.com/ee/ci/ssh_keys/
+    - yum install which -y
+    - 'which ssh-agent || ( yum install openssh-clients -y )'
+    - eval $(ssh-agent -s)
+    - ssh-add <(echo "$STAGING_KEY")
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan -H 'ipololo' >> ~/.ssh/known_hosts
+  script:
+    #- timestamp=$(date +%Y-%m-%d_%H-%M-%S_%N)
+   # - destpath=/home/test/lol
+    - ssh -T  test@ipololo
+    #- ssh  $STAGING_USER@$STAGING_IP 
+    - ssh  test@ipololo  "sudo mkdir /home/test/lol2"
+    - ssh  ${STAGING_USER}@${STAGING_IP} "sudo mkdir /home/test/lol2"
+    - scp -pr src/Backend/publish/Release ${STAGING_USER}@${STAGING_IP}:/home/test/lol/
+    # - ssh $STAGING 
+    # "
+    # service pim stop 
+    # && service seasons stop 
+    # && service calculator stop 
+    # && service deals stop 
+    # && service file-storage stop 
+    # && service web stop 
+    # && service web1capi stop
+    # && cp -r /home/test/v2/Pim /home/test/v2/old/
+    # && cp -r /home/test/v2/Seasons /home/test/v2/old/
+    # && cp -r /home/test/v2/Calculator /home/test/v2/old/
+    # && cp -r /home/test/v2/Deals /home/test/v2/old/
+    # && cp -r /home/test/v2/FileStorage /home/test/v2/old/
+    # && cp -r /home/test/v2/Web1cApi /home/test/v2/old/
+    # && cp -r /home/test/v2/WebApi /home/test/v2/old/
+    # && 
+    # "
+    # - scp -pr src/Backend/publish/Release/* $STAGING:/home/test/v2/
+  when: manual
+

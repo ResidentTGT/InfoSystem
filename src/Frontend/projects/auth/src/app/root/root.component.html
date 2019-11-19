@@ -1,0 +1,19 @@
+<header>
+    <section class="empty"></section>
+    <section class="logo">
+        <img src="assets/logo_black_horizontal.png" alt="company" />
+    </section>
+    <section class="user">
+        <ng-container *ngIf="userService.user">
+            <span class="username">{{ userService.user.displayName !== null ? userService.user.displayName :
+                userService.user.userName }}</span>
+            <button color="accent" class="profile-button" mat-icon-button (click)="logout()">
+                <mat-icon>exit_to_app</mat-icon>
+            </button>
+        </ng-container>
+    </section>
+</header>
+
+<main>
+    <router-outlet></router-outlet>
+</main>

@@ -1,0 +1,13 @@
+@import '~@angular/material/_theming.scss';
+
+$pim-primary: mat-palette($mat-grey, 800, 700, 500);
+$pim-accent: mat-palette($mat-blue-grey, 700, 500, 300);
+$pim-warn: mat-palette($mat-red, 700, 500, 300);
+
+$pim-background:mat-palette($mat-grey, 100, 300, 500);
+
+@include mat-core();
+
+$pim-theme: mat-light-theme($pim-primary, $pim-accent, $pim-warn);
+
+@include angular-material-theme($pim-theme);

@@ -1,0 +1,110 @@
+<div class="loading" *ngIf="listsLoading">
+    <mat-progress-spinner color="accent" mode="indeterminate" [strokeWidth]="8"></mat-progress-spinner>
+</div>
+<section class="lists">
+    <div class="filter">
+        <mat-form-field>
+            <input matInput [(ngModel)]="filter" (input)="filterAttributes()" placeholder="Фильтр по названию">
+        </mat-form-field>
+        <button mat-icon-button color="accent" (click)="refreshAttributes()">
+            <mat-icon>refresh</mat-icon>
+        </button>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <div #table class="table-container">
+        <table  mat-table [dataSource]="viewAttributes" multiTemplateDataRows>
+
+            <ng-container matColumnDef="id">
+                <th mat-header-cell class="id" *matHeaderCellDef>#</th>
+                <td mat-cell class="id" *matCellDef="let attributeList"> {{attributeList.id ? attributeList.id : '-'}}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="name">
+                <th mat-header-cell class="name" *matHeaderCellDef>Название</th>
+                <td mat-cell class="name" *matCellDef="let attributeList">
+                    {{attributeList.name ? attributeList.name : '-'}}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="delete">
+                <th mat-header-cell class="delete" *matHeaderCellDef></th>
+                <td mat-cell class="delete" *matCellDef="let attributeList">
+                    <button color="accent" mat-icon-button (click)="deleteAttributeList(attributeList)">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </td>
+            </ng-container>
+
+            <tr class="header-row" mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let attributeList; columns: displayedColumns;" [ngClass]="selectedList===attributeList?'selected':''"
+                (click)="selectedList=attributeList;name=attributeList.name;template=attributeList.template"></tr>
+        </table>
+    </div>
+    <mat-divider> </mat-divider>
+    <footer>
+        <button color="accent" mat-button (click)="addList()">Добавить список</button>
+    </footer>
+</section>
+
+<mat-divider vertical="true"></mat-divider>
+
+<section class="list" *ngIf="selectedList">
+    <header>
+        <div>
+            <mat-form-field>
+                <input autocomplete="off" matInput [(ngModel)]="name" placeholder="Название">
+            </mat-form-field>
+            <mat-form-field [ngClass]="{'error': template && !isValidTemplate(template)}">
+                <input autocomplete="off" matInput [(ngModel)]="template" placeholder="Шаблон">
+            </mat-form-field>
+        </div>
+        <button mat-icon-button color="accent" (click)="saveList(table)" [disabled]="!isValidTemplate(template) || !isValidList()">
+            <mat-icon>save</mat-icon>
+        </button>
+    </header>
+    <mat-divider> </mat-divider>
+    <main>
+        <div class="values">
+            <div class="meta-header">
+                <div class="title">Значения</div>
+                <div class="meta-value" *ngFor="let meta of selectedList.listMetadatas">
+                    <mat-form-field>
+                        <input autocomplete="off" matInput [(ngModel)]="meta.name" (input)="handleMetaNameInput(meta)">
+                    </mat-form-field>
+                    <button class="delete" color="warn" mat-icon-button (click)="deleteMetadata(meta)">
+                        <mat-icon>clear</mat-icon>
+                    </button>
+                </div>
+                <button class="add" color="accent" matTooltip="Добавить столбец" mat-icon-button (click)="addMetadata()">
+                    <mat-icon>add</mat-icon>
+                </button>
+            </div>
+            <mat-divider></mat-divider>
+            <div class="list-values">
+                <div class="list-val" *ngFor="let listVal of selectedList.listValues">
+                    <mat-form-field>
+                        <input autocomplete="off" matInput [(ngModel)]="listVal.value">
+                        <mat-hint align="end" *ngIf="!isValidListValue(listVal)">
+                            шаблон: {{template}}
+                        </mat-hint>
+                    </mat-form-field>
+                    <button mat-icon-button color="warn" (click)="deleteListValue(listVal)">
+                        <mat-icon>clear</mat-icon>
+                    </button>
+                    <div class="meta" *ngFor="let meta of listVal.listMetadatas">
+                        <mat-form-field>
+                            <input [placeholder]="meta.name" autocomplete="off" matInput [(ngModel)]="meta.value">
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <mat-divider> </mat-divider>
+    <footer>
+        <button color="accent" mat-button (click)="addListValue()">Добавить значение</button>
+    </footer>
+</section>

@@ -1,0 +1,13 @@
+@import '~@angular/material/_theming.scss';
+
+$auth-primary: mat-palette($mat-grey, 800, 700, 500);
+$auth-accent: mat-palette($mat-blue-grey, 700, 500, 300);
+$auth-warn: mat-palette($mat-red, 700, 500, 300);
+
+$auth-background:mat-palette($mat-grey, 100, 300, 500);
+
+@include mat-core();
+
+$auth-theme: mat-light-theme($auth-primary, $auth-accent, $auth-warn);
+
+@include angular-material-theme($auth-theme);

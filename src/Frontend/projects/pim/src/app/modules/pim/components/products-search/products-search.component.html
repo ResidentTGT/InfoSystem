@@ -1,0 +1,35 @@
+<mat-form-field class="filter">
+    <mat-chip-list #chipList>
+        <mat-chip class="mat-chip" *ngFor="let str of searchString" [removable]="true" (removed)="removeStr(str)"
+            (click)="clickChip(str, searchStringInput)" [selected]="str===selectedString">
+            {{str}}
+            <mat-icon matChipRemove>cancel</mat-icon>
+        </mat-chip>
+        <input autocomplete="off" #searchStringInput placeholder="Поиск товаров" [matChipInputFor]="chipList"
+            [matChipInputAddOnBlur]="true" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+            (matChipInputTokenEnd)="addStr($event)" (blur)="clearSearchStringInput($event)" [value]="searchStringValue">
+    </mat-chip-list>
+</mat-form-field>
+
+<mat-form-field class="filter select-attributes">
+    <input #attrFilterInput autocomplete="off" matInput type="text" class="select-attributes-search"
+        [(ngModel)]="attrFilter" (ngModelChange)="changeAttrFilter(attrFilterSelect)"
+        (focus)="isFocusedAttrFilter=true;changeAttrFilter(attrFilterSelect);" (blur)="isFocusedAttrFilter=false"
+        (click)="isFocusedAttrFilter=true;changeAttrFilter(attrFilterSelect);" [placeholder]="attrFilterPlaceholder()">
+    <mat-select #attrFilterSelect multiple [disableOptionCentering]="true" [ngModel]="selectedAttributes"
+        (ngModelChange)="selectAttributes($event)">
+        <mat-option *ngIf="!attrFilter" [value]="0" (click)="attrFilterInput.focus();changeAttrFilter();">Все атрибуты
+        </mat-option>
+        <mat-option *ngFor="let attr of attrOptions" [value]="attr.id"
+            (click)="attrFilterInput.focus();changeAttrFilter();">{{attr.name}}</mat-option>
+    </mat-select>
+</mat-form-field>
+
+<mat-form-field class="filter select-levels">
+    <mat-select multiple placeholder="Уровни товаров" [disableOptionCentering]="true" [(ngModel)]="selectedLevels"
+        (ngModelChange)="emitSelectedLevelsChangedEvent()">
+        <mat-option [value]="ModelLevel.Model">Модель</mat-option>
+        <mat-option [value]="ModelLevel.ColorModel">Цвето-модель</mat-option>
+        <mat-option [value]="ModelLevel.RangeSizeModel">Размерный ряд</mat-option>
+    </mat-select>
+</mat-form-field>

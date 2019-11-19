@@ -1,0 +1,133 @@
+<aside>
+    <div class="loading" *ngIf="dealsLoading">
+        <mat-progress-spinner color="accent" mode="indeterminate" [strokeWidth]="8"></mat-progress-spinner>
+    </div>
+    <header>
+        <div class="buttons">
+            <button mat-icon-button color="accent" class="search" matTooltip="Обновить сделки"
+                [matTooltipShowDelay]="500" (click)="_calcService.loadDeals()">
+                <mat-icon>refresh</mat-icon>
+            </button>
+            <button mat-icon-button color="accent" class="search" matTooltip="Настроить фильтры"
+                [matTooltipShowDelay]="500" (click)="filtersDialog()">
+                <mat-icon>filter_list</mat-icon>
+            </button>
+            <button mat-icon-button color="accent" class="search" matTooltip="Сбросить фильтры"
+                *ngIf="_calcService.hasFilters" [matTooltipShowDelay]="500" (click)="clearSearchFilters()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+        <div class="selected-deals">
+            <div *ngIf="selectedDeals.length">Выбранные сделки: {{selectedDeals.join(', ')}}</div>
+        </div>
+        <div class="buttons">
+            <button mat-icon-button color="accent" [disabled]="!isUserManager()" (click)="createDeal()"
+                [matTooltipShowDelay]="500" matTooltip="Создать новую сделку">
+                <mat-icon>add</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" class="delete" matTooltip="Удалить выбранные сделки"
+                [matTooltipShowDelay]="500" (click)="deleteDeals()" [disabled]="!selectedDeals.length">
+                <mat-icon>delete</mat-icon>
+            </button>
+        </div>
+    </header>
+    <mat-divider></mat-divider>
+    <div class="table-container">
+        <table mat-table [dataSource]="dataSource">
+
+            <ng-container matColumnDef="select" sticky>
+                <th mat-header-cell class="checkbox" *matHeaderCellDef></th>
+                <td mat-cell class="checkbox" *matCellDef="let deal">
+                    <mat-checkbox *ngIf="deal.status === DealStatus.NotConfirmed" color="accent"
+                        (click)="$event.stopPropagation()" (change)="$event ? selectDeal(deal.id)  : null"
+                        [checked]="isDealSelected(deal.id)">
+                    </mat-checkbox>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="id" sticky>
+                <th mat-header-cell class="id" *matHeaderCellDef>#</th>
+                <td mat-cell class="id" *matCellDef="let deal">{{deal.id}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="status" sticky>
+                <th mat-header-cell class="status" *matHeaderCellDef>Статус</th>
+                <td mat-cell class="status" *matCellDef="let deal">
+                    <ng-container [ngSwitch]="deal.status">
+                        <mat-icon class="confirmed" *ngSwitchCase="DealStatus.Confirmed">done</mat-icon>
+                        <mat-icon class="not-confirmed" *ngSwitchCase="DealStatus.NotConfirmed">remove</mat-icon>
+                        <mat-icon class="on-payment" *ngSwitchCase="DealStatus.OnPayment">next_week</mat-icon>
+                    </ng-container>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="contractor">
+                <th mat-header-cell class="contractor" *matHeaderCellDef>Контрагент</th>
+                <td mat-cell class="contractor" *matCellDef="let deal">{{deal.contractor}}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="brand">
+                <th mat-header-cell class="brand" *matHeaderCellDef>Бренд</th>
+                <td mat-cell class="brand" *matCellDef="let deal">{{deal.brand}}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="season">
+                <th mat-header-cell class="season" *matHeaderCellDef>Сезон</th>
+                <td mat-cell class="season" *matCellDef="let deal">
+                    {{!!seasons.length ? getSeasonName(deal.seasonId) : '-'}}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="discount">
+                <th mat-header-cell class="discount" *matHeaderCellDef>Скидка</th>
+                <td mat-cell class="discount" *matCellDef="let deal">{{deal.discount ? deal.discount + '%' : '-'}}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="manager">
+                <th mat-header-cell class="manager" *matHeaderCellDef>Менеджер</th>
+                <td mat-cell class="manager" *matCellDef="let deal">{{deal.managerName}}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="department">
+                <th mat-header-cell class="department" *matHeaderCellDef>Подразделение</th>
+                <td mat-cell class="department" *matCellDef="let deal">
+                    {{!!departments.length ? getDepartmentName(deal.managerId) : '-'}}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="createDate">
+                <th mat-header-cell class="date" *matHeaderCellDef>Дата создания</th>
+                <td mat-cell class="date" *matCellDef="let deal">{{deal.createDate | date:"shortDate"}}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="upload1cTime">
+                <th mat-header-cell class="date" *matHeaderCellDef>Загрузка в 1С</th>
+                <td mat-cell class="date" *matCellDef="let deal">
+                    {{deal.upload1cTime ? (deal.upload1cTime | date:"shortDate") : '-'}}
+                </td>
+            </ng-container>
+
+            <tr class="header" mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr class="deal-row" mat-row *matRowDef="let deal; columns: displayedColumns;" [routerLink]="deal.id"
+                routerLinkActive="active">
+            </tr>
+
+        </table>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <footer>
+        <mat-paginator #paginator [length]="pageLength" [pageSizeOptions]="pageSizeOptions" [pageIndex]="pageNumber"
+            (page)="handlePageEvent($event)"></mat-paginator>
+    </footer>
+</aside>
+
+<main>
+    <router-outlet></router-outlet>
+</main>

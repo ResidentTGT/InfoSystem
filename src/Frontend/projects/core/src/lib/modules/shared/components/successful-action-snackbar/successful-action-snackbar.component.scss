@@ -1,0 +1,20 @@
+:host {
+    background: #eceff1;
+}
+
+.layout {
+    display: flex;
+    .mat-icon {
+        color: green;
+        align-self: center;
+        font-size: 30px;
+        width: 30px;
+        height: 30px;
+    }
+    div {
+        align-self: center;
+        margin-left: 5px;
+        word-break: break-word;
+        color: white;
+    }
+}

@@ -1,0 +1,110 @@
+<section class="images">
+    <div class="loading" *ngIf="imagesLoading">
+        <mat-progress-bar color="accent" mode="indeterminate"></mat-progress-bar>
+    </div>
+    <div class="main-image-form">
+
+        <div *ngIf="mainImage" class="main-image-container">
+            <div class="main-image" (click)="openImage(mainImage)">
+                <img [src]="mainImage.src | sanitizeUrl" alt="Main image" />
+            </div>
+            <div class="name">{{mainImage.name}}</div>
+            <div class="additional-buttons">
+                <a href="{{mainImage.src}}" mat-icon-button color="primary">
+                    <mat-icon>file_download</mat-icon>
+                </a>
+                <button [disabled]="!this.isPimResourceEditable(PimResourcePermissionsNames.Media)" color="warn"
+                    (click)="clearMainImage()" mat-icon-button>
+                    <mat-icon>clear</mat-icon>
+                </button>
+            </div>
+        </div>
+        <div *ngIf="!mainImage&&!imagesLoading" class="add-main-image">
+            <mat-icon color="accent" class="tab-icon">add</mat-icon>
+            <input [disabled]="!this.isPimResourceEditable(PimResourcePermissionsNames.Media)" type="file"
+                accept="image/*" (change)="addMainImage($event)" />
+        </div>
+    </div>
+
+    <mat-divider vertical="true"></mat-divider>
+
+    <div class="additional-images-form">
+
+        <div *ngFor="let media of mediaContent" class="additional-image-container">
+            <div class="media" *ngIf="media.type===FileType.Image">
+                <div class="media-content" (click)="openImage(media)">
+                    <img [src]="media.src | sanitizeUrl" alt="Media content" />
+                </div>
+                <div class="name">{{media.name}}</div>
+                <div class="additional-buttons">
+                    <a href="{{media.src}}" mat-icon-button color="primary">
+                        <mat-icon>file_download</mat-icon>
+                    </a>
+                    <button [disabled]="!this.isPimResourceEditable(PimResourcePermissionsNames.Media)"
+                        (click)="makeMainImage(media)" color="primary" mat-icon-button>
+                        <mat-icon>portrait</mat-icon>
+                    </button>
+                    <button [disabled]="!this.isPimResourceEditable(PimResourcePermissionsNames.Media)" color="warn"
+                        (click)="deleteMedia(media)" mat-icon-button>
+                        <mat-icon>clear</mat-icon>
+                    </button>
+                </div>
+            </div>
+            <div class="media" *ngIf="media.type===FileType.Video">
+                <div class="media-content" (click)="openImage(media)">
+                    <video controls [src]="media.src | sanitizeUrl"></video>
+                </div>
+                <div class="name">{{media.name}}</div>
+                <div class="additional-buttons">
+                    <a href="{{media.src}}" mat-icon-button color="primary">
+                        <mat-icon>file_download</mat-icon>
+                    </a>
+                    <button [disabled]="!this.isPimResourceEditable(PimResourcePermissionsNames.Media)" color="warn"
+                        (click)="deleteMedia(media)" mat-icon-button>
+                        <mat-icon>clear</mat-icon>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="add-additional-image">
+            <mat-icon color="accent">add</mat-icon>
+            <input multiple [disabled]="!this.isPimResourceEditable(PimResourcePermissionsNames.Media)" #addInput
+                type="file" accept="image/*,video/*" (change)="addMedia($event,addInput)" />
+        </div>
+
+    </div>
+</section>
+
+<mat-divider></mat-divider>
+
+<section class="documents">
+    <div class="loading" *ngIf="documentsLoading">
+        <mat-progress-bar color="accent" mode="indeterminate"></mat-progress-bar>
+    </div>
+
+    <div class="title">Файлы</div>
+    <div class="documents-form">
+
+        <div *ngFor="let document of documents" class="document-container">
+            <div class="document">
+                <a class="ref-button" href="{{document.src}}" mat-stroked-button color="accent">
+                    <mat-icon>file_download</mat-icon>
+                    <div class="name">{{document.name}}</div>
+                </a>
+                <button class="delete-button"
+                    [disabled]="!this.isPimResourceEditable(PimResourcePermissionsNames.Documents)" color="warn"
+                    (click)="deleteDocument(document)" mat-mini-fab>
+                    <mat-icon>clear</mat-icon>
+                </button>
+            </div>
+        </div>
+
+        <div class="add-document">
+            <mat-icon color="accent">add</mat-icon>
+            <input multiple [disabled]="!this.isPimResourceEditable(PimResourcePermissionsNames.Documents)" #addInput
+                type="file" accept="*" (change)="addDocument($event,addInput)" />
+        </div>
+    </div>
+
+</section>

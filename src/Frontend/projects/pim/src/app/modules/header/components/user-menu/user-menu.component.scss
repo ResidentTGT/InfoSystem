@@ -1,0 +1,26 @@
+@import '~@angular/material/_theming.scss';
+@import 'projects/pim/src/pim-colors.scss';
+:host {
+    display: flex;
+    align-items: center;
+}
+
+.username {
+    color: black;
+    margin-right: 10px;
+    font-weight: 300;
+}
+
+.profile-button {
+    display: flex;
+    align-self: center;
+    width: 45px;
+    height: 45px;
+    justify-content: center;
+    margin-right: 10px;
+    transition: 200ms;
+    background: map-get($pim-accent, 50);
+    &:hover {
+        background: map-get($pim-accent, 100);
+    }
+}

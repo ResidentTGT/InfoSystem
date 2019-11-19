@@ -1,0 +1,59 @@
+<aside #asideelem>
+    <div>
+        <a class="item" *ngIf="userService.isSectionAvailable(Module.PIM , PimSectionPermissionsNames[2])" [routerLink]="['categories']"
+            routerLinkActive="active">
+            <button matTooltip="Категории" matTooltipPosition='right' [matTooltipDisabled]="isExpanded()"
+                mat-icon-button>
+                <mat-icon>category</mat-icon>
+            </button>
+            <div>Категории</div>
+        </a>
+        <a class="item" *ngIf="userService.isSectionAvailable(Module.PIM , PimSectionPermissionsNames[3])" [routerLink]="['attributes']"
+            routerLinkActive="active">
+            <button matTooltip="Атрибуты" matTooltipPosition='right' [matTooltipDisabled]="isExpanded()"
+                mat-icon-button>
+                <mat-icon>art_track</mat-icon>
+            </button>
+            <div>Атрибуты</div>
+        </a>
+        <a class="item" *ngIf="userService.isSectionAvailable(Module.PIM , PimSectionPermissionsNames[4])" [routerLink]="['groups']"
+            routerLinkActive="active">
+            <button matTooltip="Группы атрибутов" matTooltipPosition='right' [matTooltipDisabled]="isExpanded()"
+                mat-icon-button>
+                <mat-icon>dashboard</mat-icon>
+            </button>
+            <div>Группы атрибутов</div>
+        </a>
+        <a class="item" *ngIf="userService.isSectionAvailable(Module.PIM , PimSectionPermissionsNames[6])" [routerLink]="['lists']"
+            routerLinkActive="active">
+            <button matTooltip="Списки" matTooltipPosition='right' [matTooltipDisabled]="isExpanded()"
+                mat-icon-button>
+                <mat-icon>list</mat-icon>
+            </button>
+            <div>Списки</div>
+        </a>
+        <a class="item" *ngIf="userService.isSectionAvailable(Module.PIM , PimSectionPermissionsNames[5])" [routerLink]="['permissions']"
+            routerLinkActive="active">
+            <button matTooltip="Разрешения" matTooltipPosition='right' [matTooltipDisabled]="isExpanded()"
+                mat-icon-button>
+                <mat-icon>perm_identity</mat-icon>
+            </button>
+            <div>Разрешения</div>
+        </a>
+    </div>
+    <div class="footer" (click)="expand()">
+        <mat-divider></mat-divider>
+        <div>
+            <button mat-icon-button>
+                <mat-icon>{{isExpanded()?'chevron_left':'chevron_right'}}</mat-icon>
+            </button>
+            <div>Свернуть</div>
+        </div>
+    </div>
+</aside>
+<mat-divider vertical="true"></mat-divider>
+<main>
+
+    <router-outlet></router-outlet>
+
+</main>

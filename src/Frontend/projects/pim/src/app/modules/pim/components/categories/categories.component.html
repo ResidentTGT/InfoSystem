@@ -1,0 +1,32 @@
+<div class="loading" *ngIf="categoriesLoading">
+    <mat-progress-spinner color="accent" mode="indeterminate" [strokeWidth]="8"></mat-progress-spinner>
+</div>
+
+<div class="filter">
+    <mat-form-field>
+        <input autocomplete="off" matInput [(ngModel)]="filter" (ngModelChange)="updateCategories()"
+            placeholder="Фильтр категорий">
+    </mat-form-field>
+</div>
+<mat-checkbox class="without-categories" [(ngModel)]="withoutCategory" (change)="updateWithoutCategory($event.checked) ">Без категории
+</mat-checkbox>
+<mat-tree class="tree" *ngIf="!!dataSource.data.length" [dataSource]="dataSource" [treeControl]="treeControl">
+    <mat-tree-node *matTreeNodeDef="let category" [ngClass]="checkVisibilityMatching(category)" matTreeNodePadding>
+        <button mat-icon-button disabled></button>
+        <mat-checkbox color="accent" class="checklist-leaf-node" [checked]="checklistSelection.isSelected(category)"
+            (change)="selectCategory(category);
+        emitSelectedCategoryEvent();">{{category.name}}</mat-checkbox>
+    </mat-tree-node>
+
+    <mat-tree-node *matTreeNodeDef="let category;when: hasChild" [ngClass]="checkVisibilityMatching(category)"
+        matTreeNodePadding>
+        <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'toggle ' + category.name">
+            <mat-icon class="mat-icon-rtl-mirror">
+                {{treeControl.isExpanded(category) ? 'expand_more' : 'chevron_right'}}
+            </mat-icon>
+        </button>
+        <mat-checkbox color="accent" [checked]="areAllDescendantsSelected(category)"
+            [indeterminate]="descendantsPartiallySelected(category)" (change)="selectCategoryWithChildren(category);
+        emitSelectedCategoryEvent();">{{category.name}}</mat-checkbox>
+    </mat-tree-node>
+</mat-tree>

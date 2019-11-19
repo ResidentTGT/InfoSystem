@@ -1,0 +1,64 @@
+@import '~@angular/material/_theming.scss';
+@import 'projects/pim/src/pim-colors.scss';
+
+.search-deals-dialog-layout {
+    position: relative;
+    width: 940px;
+    overflow: hidden;
+
+    .loading {
+        z-index: 1000;
+        position: absolute;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.08);
+    }
+
+    .dialog-content {
+        padding: 20px 20px 0 20px;
+
+        header {
+            display: flex;
+            padding-bottom: 10px;
+
+            .mat-icon {
+                align-self: center;
+            }
+
+            div {
+                font-size: 18px;
+                padding: 2px 10px;
+            }
+        }
+
+        main {
+            padding: 10px 0 0 0;
+            word-break: break-word;
+
+            .filters {
+                display: flex;
+                justify-content: space-between;
+
+                .mat-form-field {
+                    width: 48%;
+
+                    .mat-select, input {
+                        width: 100%;
+                    }
+                }
+            }
+        }
+
+        footer {
+            display: flex;
+            justify-content: flex-end;
+
+            button {
+                margin: 10px 0 10px 15px;
+            }
+        }
+    }
+}

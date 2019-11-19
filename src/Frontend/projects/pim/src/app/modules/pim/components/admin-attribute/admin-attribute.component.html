@@ -1,0 +1,147 @@
+<main class="admin-attribute-main">
+    <mat-tab-group dynamicHeight [selectedIndex]="0">
+
+        <mat-tab label="Основная информация">
+            <div class="main-info">
+                <mat-form-field class="name">
+                    <input type="text" autocomplete="off" matInput placeholder="Название"
+                           [(ngModel)]="attribute.name" (ngModelChange)="attributeChanged.emit(attribute)"/>
+                </mat-form-field>
+                <div class="type">
+                    <mat-form-field>
+                        <mat-select placeholder="Тип" [(ngModel)]="attribute.type" (ngModelChange)="attributeChanged.emit(attribute)">
+                            <mat-option *ngFor="let attrType of getAttributeTypes()" [value]="attrType">
+                                {{attrType|attributeType}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field class="list" *ngIf="attribute.type===AttributeType.List">
+                        <mat-select [(ngModel)]="attribute.listId" (ngModelChange)="attributeChanged.emit(attribute)">
+                            <mat-option *ngFor="let listVal of attributesLists" [value]="listVal.id">{{listVal.name}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <mat-form-field class="group">
+                    <mat-select placeholder="Группа" [(ngModel)]="attribute.groupId" (ngModelChange)="attributeChanged.emit(attribute)">
+                        <mat-option [value]="null">
+                            -
+                        </mat-option>
+                        <mat-option *ngFor="let group of attributesGroups" [value]="group.id">
+                            {{group.name}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </mat-tab>
+
+        <mat-tab label="Ограничения">
+            <div class="validators" [ngSwitch]="attribute.type">
+                <div class="warning" *ngSwitchCase="AttributeType.Boolean">
+                    <div>Для типа "Да/Нет" нет валидаторов.</div>
+                </div>
+                <div class="number" *ngSwitchCase="AttributeType.Number">
+                    <mat-form-field>
+                        <input autocomplete="off" matInput type="number" placeholder="Минимальное значение"
+                               [(ngModel)]="attribute.min" (ngModelChange)="attributeChanged.emit(attribute)">
+                    </mat-form-field>
+                    <mat-form-field>
+                        <input autocomplete="off" matInput type="number" placeholder="Максимальное значение"
+                               [(ngModel)]="attribute.max" (ngModelChange)="attributeChanged.emit(attribute)">
+                    </mat-form-field>
+                </div>
+                <div class="string" *ngSwitchCase="AttributeType.String">
+                    <mat-form-field>
+                        <input autocomplete="off" matInput placeholder="Минимальная длина" [(ngModel)]="attribute.minLength"
+                               (ngModelChange)="attributeChanged.emit(attribute)">
+                    </mat-form-field>
+                    <mat-form-field>
+                        <input autocomplete="off" matInput placeholder="Максимальная длина" [(ngModel)]="attribute.maxLength"
+                               (ngModelChange)="attributeChanged.emit(attribute)">
+                    </mat-form-field>
+                    <mat-form-field>
+                        <input autocomplete="off" matInput placeholder="Шаблон" [(ngModel)]="attribute.template"
+                               (ngModelChange)="attributeChanged.emit(attribute)">
+                    </mat-form-field>
+                </div>
+                <div class="text" *ngSwitchCase="AttributeType.Text">
+                    <mat-form-field>
+                        <input autocomplete="off" matInput placeholder="Минимальная длина" [(ngModel)]="attribute.minLength"
+                               (ngModelChange)="attributeChanged.emit(attribute)">
+                    </mat-form-field>
+                    <mat-form-field>
+                        <input autocomplete="off" matInput placeholder="Максимальная длина" [(ngModel)]="attribute.maxLength"
+                               (ngModelChange)="attributeChanged.emit(attribute)">
+                    </mat-form-field>
+                </div>
+                <div class="warning" *ngSwitchCase="AttributeType.List">
+                    <div>Для типа "Список" нет валидаторов.</div>
+                </div>
+                <div class="date" *ngSwitchCase="AttributeType.Date">
+                    <mat-form-field (click)="pickermin.open()">
+                        <input autocomplete="off" matInput readonly placeholder="Минимальная дата" [matDatepicker]="pickermin"
+                               [(ngModel)]="attribute.minDate" (ngModelChange)="attributeChanged.emit(attribute)">
+                        <mat-datepicker-toggle matSuffix [for]="pickermin"></mat-datepicker-toggle>
+                        <mat-datepicker #pickermin></mat-datepicker>
+                    </mat-form-field>
+                    <mat-form-field (click)="pickermax.open()">
+                        <input autocomplete="off" matInput readonly placeholder="Максимальная дата" [matDatepicker]="pickermax"
+                               [(ngModel)]="attribute.maxDate" (ngModelChange)="attributeChanged.emit(attribute)">
+                        <mat-datepicker-toggle matSuffix [for]="pickermax"></mat-datepicker-toggle>
+                        <mat-datepicker #pickermax></mat-datepicker>
+                    </mat-form-field>
+                </div>
+            </div>
+        </mat-tab>
+
+        <mat-tab label="Категории">
+            <mat-tree class="categories" *ngIf="!!categoriesDataSource.data.length" [dataSource]="categoriesDataSource"
+                      [treeControl]="treeControl">
+                <mat-tree-node *matTreeNodeDef="let category" matTreeNodePadding>
+                    <button mat-icon-button disabled></button>
+                    <mat-checkbox color="accent" class="checklist-leaf-node" [checked]="checklistSelection.isSelected(category)"
+                                  [ngStyle]="{'font-weight': checklistSelection.isSelected(category)?'600':'400'}" (change)="selectCategory(category)">{{category.name}}</mat-checkbox>
+                </mat-tree-node>
+                <mat-tree-node *matTreeNodeDef="let category;when: hasChild" matTreeNodePadding>
+                    <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'toggle ' + category.name">
+                        <mat-icon class="mat-icon-rtl-mirror">
+                            {{treeControl.isExpanded(category) ? 'expand_more' : 'chevron_right'}}
+                        </mat-icon>
+                    </button>
+                    <mat-checkbox (dblclick)="selectCategoryWithChildren(category);$event.preventDefault();" color="accent"
+                                  (change)="selectCategory(category)" [checked]="checklistSelection.isSelected(category)"
+                                  [ngStyle]="{'font-weight': descendantsPartiallySelected(category)||checklistSelection.isSelected(category)?'600':'400'}">{{category.name}}</mat-checkbox>
+                </mat-tree-node>
+            </mat-tree>
+        </mat-tab>
+
+        <mat-tab label="Разрешения">
+            <div class="permissions">
+
+                <header>
+                    <div class="first-column">Роль</div>
+                    <div class="action">Чтение</div>
+                    <div class="action">Изменение</div>
+                </header>
+                <main>
+                    <div class="role" *ngFor="let role of roles">
+                        <div class="first-column">{{role.name}}</div>
+                        <div class="checkboxes">
+                            <mat-checkbox class="action" [checked]="isExistPermission(role, DataAccessMethods.Read)"
+                                          (change)="changePermission($event, role, DataAccessMethods.Read)"></mat-checkbox>
+                            <mat-checkbox class="action" [checked]="isExistPermission(role, DataAccessMethods.Write)"
+                                          (change)="changePermission($event, role, DataAccessMethods.Write)"></mat-checkbox>
+                        </div>
+                    </div>
+                </main>
+
+            </div>
+        </mat-tab>
+
+        <mat-tab disabled>
+            <ng-template mat-tab-label>
+                <button color="accent" mat-flat-button (click)="saveAttribute()" [disabled]="!isValidAttribute()">Сохранить</button>
+            </ng-template>
+        </mat-tab>
+
+    </mat-tab-group>
+</main>

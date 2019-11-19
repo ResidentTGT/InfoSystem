@@ -1,0 +1,59 @@
+<header>
+    <mat-form-field>
+        <input autocomplete="off" (ngModelChange)="updateName()" matInput placeholder="Наименование"
+            [formControl]="nameFormControl" [errorStateMatcher]="errorMatcher">
+        <mat-error *ngIf="nameFormControl.hasError('required')">
+            Поле не может быть пустым
+        </mat-error>
+    </mat-form-field>
+    <div *ngIf="product && product.id" class="sku"><strong>SKU:</strong> {{product.sku}}</div>
+</header>
+
+<mat-divider></mat-divider>
+
+<main>
+    <company-documents [setProduct]="product" (documentsChanged)="changeDocuments($event)" class="company-documents"></company-documents>
+
+    <mat-divider></mat-divider>
+
+    <mat-tab-group color="accent">
+
+        <mat-tab>
+            <ng-template mat-tab-label>
+                <mat-icon class="tab-icon">format_list_bulleted</mat-icon>
+                Атрибуты
+            </ng-template>
+
+            <company-attributes [attributesPermissions]="attributesPermissions" [attributesGroups]="colorAttributesGroups"
+                [setProduct]="product" [attributesCategories]="getAttributesCategories(ModelLevel.ColorModel)"
+                (propertiesChanged)="changeProductProperties($event)">
+            </company-attributes>
+        </mat-tab>
+
+        <mat-tab>
+            <ng-template mat-tab-label>
+                <mat-icon class="tab-icon">crop</mat-icon>
+                Размерные ряды
+            </ng-template>
+
+            <section class="size-models">
+                <mat-card *ngFor="let sizeModel of product.subProducts">
+                    <company-size-model [setProduct]="sizeModel" [attributesPermissions]="attributesPermissions"
+                        [attributesGroups]="sizeAttributesGroups"
+                        [attributesCategories]="getAttributesCategories(ModelLevel.RangeSizeModel)"></company-size-model>
+
+                    <button color="warn" class="delete-button" (click)="deleteSizeModel(sizeModel)"
+                        [disabled]="!this.isPimResourceDeletable(PimResourcePermissionsNames.Product)" mat-icon-button>
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </mat-card>
+
+                <button class="add-button" mat-icon-button color="accent" (click)="addSizeModel()">
+                    <mat-icon>add</mat-icon>
+                </button>
+            </section>
+        </mat-tab>
+
+    </mat-tab-group>
+
+</main>

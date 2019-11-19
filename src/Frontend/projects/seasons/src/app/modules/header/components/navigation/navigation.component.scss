@@ -1,0 +1,38 @@
+@import '~@angular/material/_theming.scss';
+@import 'projects/seasons/src/seasons-colors.scss';
+nav {
+    display: flex;
+    align-items: stretch;
+    height: 100%;
+    position: relative;
+    margin-left: 50px;
+    .module {
+        display: flex;
+        height: 100%;
+        position: relative;
+        div {
+            height: 40px;
+            line-height: 40px;
+            align-self: center;
+        }
+        button {
+            font-weight: 400;
+            font-size: 16px;
+            height: 40px;
+            align-self: center;
+            margin-left: 10px;
+            padding: 1px 5px 1px 10px;
+            transition: 200ms;
+        }
+    }
+}
+
+a {
+    transition: 200ms;
+    &.active {
+        background: map-get($seasons-accent, 50);
+    }
+    &:hover {
+        background: map-get($seasons-accent, 100) !important;
+    }
+}

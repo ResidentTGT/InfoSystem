@@ -1,0 +1,155 @@
+<div class="layout">
+    <div class="loading" *ngIf="productLoading">
+        <mat-progress-spinner color="accent" mode="indeterminate" [strokeWidth]="8"></mat-progress-spinner>
+    </div>
+
+    <div class="error" *ngIf="error">
+        <div>{{error}}</div>
+    </div>
+
+    <button class="save-button" *ngIf="product&&!!attributesLists.length" mat-raised-button color="accent" [disabled]="!rrcCoef||!rrc||!wholesalePrice||!wholesalePriceCoef||!productRole"
+        (click)="saveProduct()">
+        Сохранить
+    </button>
+
+    <header *ngIf="product">
+        <div class="main-info">
+            <div class="image-container" (click)="openImage(backendApiService.FileStorage.getFileSrc(product.mainImgId))">
+                <img [src]="product.mainImgId ? backendApiService.FileStorage.getFileSrc(product.mainImgId) : 'assets/no-photo.png'" alt="Product photo" />
+            </div>
+            <div class="info" *ngIf="!!categories.length">
+                <div>Наименование: {{product.name}}</div>
+                <div>SKU: {{product.sku}}</div>
+                <div>Категория: {{getCategoryName(product.categoryId)}}</div>
+                <div class="role" *ngIf="roleList">
+                    <mat-form-field>
+                        <mat-select (selectionChange)="changeParams()" [(ngModel)]="productRole" placeholder="Роль">
+                            <mat-option *ngFor="let role of roleList.listValues" [value]="role">{{role.value}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+        <div class="form">
+            <div class="table">
+
+                <div class="sum" *ngIf="product&&!!attributesLists.length">
+                    <div class="column1">
+                        <div class="first"></div>
+                        <mat-divider></mat-divider>
+                        <div class="second">Landing Cost</div>
+                        <mat-divider></mat-divider>
+                        <div>Коэф. БОЦ</div>
+                        <mat-divider></mat-divider>
+                        <div>БОЦ</div>
+                        <mat-divider></mat-divider>
+                        <div>Коэф. РРЦ</div>
+                        <mat-divider></mat-divider>
+                        <div>РРЦ</div>
+                    </div>
+                    <mat-divider vertical="true"></mat-divider>
+                    <div class="column2">
+                        <div class="row first">
+                            <div class="name">Авто</div>
+                            <div class="name">Ручное</div>
+                        </div>
+
+                        <mat-divider></mat-divider>
+                        <div class="row lc">{{(getProductAttributeNumValue(env.attributesIds.lc)|ceilTwoDigits)}}
+                            {{getCurrency()}}</div>
+                        <mat-divider></mat-divider>
+                        <div class="row">
+                            <div class="name">{{baseWholesaleCoef|ceilTwoDigits}}</div>
+                            <mat-form-field>
+                                <input (input)="calcPrices(1)" [disabled]="pin===1" type="number" matInput [ngModel]="wholesalePriceCoef|ceilTwoDigits"
+                                    (ngModelChange)="wholesalePriceCoef=$event">
+                            </mat-form-field>
+                        </div>
+                        <mat-divider></mat-divider>
+                        <div class="row">
+                            <div class="name">{{((getProductAttributeNumValue(env.attributesIds.lc) *
+                                baseWholesaleCoef)|ceilTwoDigits)}} {{getCurrency()}}</div>
+                            <mat-form-field>
+                                <input (input)="calcPrices(2)" [disabled]="pin===1" type="number" matInput [ngModel]="wholesalePrice|ceilTwoDigits"
+                                    (ngModelChange)="wholesalePrice=$event">
+                                <div matSuffix>{{getCurrency()}}</div>
+                            </mat-form-field>
+                        </div>
+                        <mat-divider></mat-divider>
+                        <div class="row">
+                            <div class="name">{{baseRrcCoef|ceilTwoDigits}}</div>
+                            <mat-form-field>
+                                <input (input)="calcPrices(3)" [disabled]="pin===2" type="number" matInput [ngModel]="rrcCoef|ceilTwoDigits"
+                                    (ngModelChange)="rrcCoef=$event">
+                            </mat-form-field>
+                        </div>
+                        <mat-divider></mat-divider>
+                        <div class="row">
+                            <div class="name">{{((getProductAttributeNumValue(env.attributesIds.lc) * baseWholesaleCoef
+                                * baseRrcCoef)|ceilTwoDigits)}} {{getCurrency()}}</div>
+                            <mat-form-field>
+                                <input (input)="calcPrices(4)" [disabled]="pin===3" type="number" matInput [ngModel]="rrc|ceilTwoDigits"
+                                    (ngModelChange)="rrc=$event">
+                                <div matSuffix>{{getCurrency()}}</div>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <mat-divider vertical="true"></mat-divider>
+                    <div class="column3">
+                        <div class="first">Закрепить</div>
+                        <mat-divider></mat-divider>
+                        <div class="second"></div>
+                        <mat-divider></mat-divider>
+                        <mat-radio-group [(ngModel)]="pin">
+                            <mat-radio-button class="row" [value]="1"></mat-radio-button>
+                            <mat-divider></mat-divider>
+                            <mat-radio-button class="row" [value]="2"></mat-radio-button>
+                            <mat-divider></mat-divider>
+                            <mat-radio-button class="row" [value]="3"></mat-radio-button>
+                        </mat-radio-group>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="profitability">Рентабельность: {{(profitability|ceilTwoDigits)}}%</div>
+    </header>
+    <mat-divider></mat-divider>
+    <main>
+        <div *ngIf="product" class="attributes">
+            <div class="item" *ngFor="let property of product.properties">
+                <div class="value" *ngIf="!!attributesLists.length&&getAttributeValue(property)">{{property.attribute.name}}:
+                </div>
+                <div class="value" *ngIf="!!attributesLists.length && getAttributeValue(property)">
+                    {{getAttributeValue(property)}}</div>
+            </div>
+        </div>
+        <mat-divider></mat-divider>
+
+        <div class="gallery">
+            <div *ngFor="let media of mediaContent" class="media-container">
+                <div class="media" *ngIf="media.type===FileType.Image">
+                    <div class="media-content" (click)="openImage(media.src)">
+                        <img [src]="media.src | sanitizeUrl" alt="Media content" />
+                    </div>
+                    <div class="name">{{media.name}}</div>
+                    <div class="additional-buttons">
+                        <a href="{{media.src}}" mat-icon-button color="primary">
+                            <mat-icon>file_download</mat-icon>
+                        </a>
+                    </div>
+                </div>
+                <div class="media" *ngIf="media.type===FileType.Video">
+                    <div class="media-content" (click)="openImage(media.src)">
+                        <video controls [src]="media.src | sanitizeUrl"></video>
+                    </div>
+                    <div class="name">{{media.name}}</div>
+                    <div class="additional-buttons">
+                        <a href="{{media.src}}" mat-icon-button color="primary">
+                            <mat-icon>file_download</mat-icon>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>

@@ -1,0 +1,138 @@
+<div class="layout">
+    <mat-card class="main-card">
+        <div class="loading" *ngIf="loading">
+            <mat-progress-spinner color="accent" mode="indeterminate" [strokeWidth]="6"></mat-progress-spinner>
+        </div>
+        <header>
+            <button mat-icon-button color="accent" (click)="refreshImports()">
+                <mat-icon>refresh</mat-icon>
+            </button>
+            <div class="inputs">
+                <button mat-icon-button color="accent" (click)="editNecessaryAttributes()">
+                    <mat-icon>settings</mat-icon>
+                </button>
+                <div class="input-form">
+                    <input id="inputOldFile" autocomplete="off" type="file" class="input-file old"
+                        (change)="uploadImport($event, true)">
+                    <label for="inputOldFile">Старый импорт</label>
+                </div>
+                <div class="input-form">
+                    <input id="inputFile" autocomplete="off" type="file" class="input-file new"
+                        (change)="uploadImport($event)">
+                    <label for="inputFile">Новый импорт</label>
+                </div>
+            </div>
+        </header>
+        <mat-divider></mat-divider>
+        <main>
+            <table mat-table matSort [dataSource]="imports" multiTemplateDataRows>
+
+                <ng-container matColumnDef="id">
+                    <th mat-header-cell mat-sort-header class="id" *matHeaderCellDef>№</th>
+                    <td mat-cell class="id" *matCellDef="let import"> {{import.id ? import.id : '-'}}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="name">
+                    <th mat-header-cell class="name" mat-sort-header *matHeaderCellDef>Название</th>
+                    <td mat-cell class="name" *matCellDef="let import"> {{import.name ? import.name : '-'}}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="date">
+                    <th mat-header-cell class="date" mat-sort-header *matHeaderCellDef>Дата</th>
+                    <td mat-cell class="date" *matCellDef="let import"> {{import.createDate | date:"short" }}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="importerName">
+                    <th mat-header-cell class="importer" mat-sort-header *matHeaderCellDef>Импортер</th>
+                    <td mat-cell class="importer" *matCellDef="let import"> {{import.importerName ? import.importerName
+                        : '-'}}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="download">
+                    <th mat-header-cell class="download" *matHeaderCellDef>Файл</th>
+                    <td class="download" (click)="$event.stopPropagation()" mat-cell *matCellDef="let import">
+                        <a href="{{api.FileStorage.getFileSrc(import.fileId)}}" mat-icon-button color="primary">
+                            <mat-icon>file_download</mat-icon>
+                        </a>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="status">
+                    <th mat-header-cell class="status" mat-sort-header *matHeaderCellDef>Статус</th>
+                    <td mat-cell class="status" *matCellDef="let import">
+                        <mat-icon class="success" *ngIf="import.finishedSuccess!==null&&import.finishedSuccess===true">
+                            done</mat-icon>
+                        <mat-icon class="error"
+                            *ngIf="import.finishedSuccess!==null&&import.finishedSuccess===false&&import.totalCount===0">
+                            error</mat-icon>
+                        <mat-icon class="warning"
+                            *ngIf="import.finishedSuccess!==null&&import.finishedSuccess===false&&import.totalCount!==0">
+                            warning</mat-icon>
+                        <mat-icon *ngIf="import.finishedSuccess===null">cached</mat-icon>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="total">
+                    <th mat-header-cell class="total" *matHeaderCellDef>
+                        <div matTooltip="Всего загружено">Всего</div>
+                    </th>
+                    <td mat-cell class="total" *matCellDef="let import"> {{import.totalCount || ''}}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="totalLevels">
+                    <th mat-header-cell class="total" *matHeaderCellDef>
+                        <div matTooltip="Загружено моделей / цвето-моделей / размерных рядов">М / Ц / Р</div>
+                    </th>
+                    <td mat-cell class="total" *matCellDef="let import"> {{totalLevelsCount(import)}}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="error">
+                    <th mat-header-cell class="error" *matHeaderCellDef>
+                        <div matTooltip="Ошибки в загрузке">Ошибки</div>
+                    </th>
+                    <td mat-cell class="error" *matCellDef="let import"> {{import.errorCount || ''}}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="errorLevels">
+                    <th mat-header-cell class="error" *matHeaderCellDef>
+                        <div matTooltip="Ошибки в моделях / цвето-размерах / размерных рядах">М / Ц / Р</div>
+                    </th>
+                    <td mat-cell class="error" *matCellDef="let import"> {{errorLevelsCount(import)}}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="expandedImport">
+                    <td mat-cell *matCellDef="let import" [attr.colspan]="displayedColumns.length">
+                        <div class="import"
+                            [@importExpand]="import.finishedSuccess===null||(import === expandedImport && import.finishedSuccess===false)? 'expanded' : 'collapsed'">
+                            <div class="loading" *ngIf="errorLoading">
+                                <mat-progress-spinner color="accent" mode="indeterminate" [strokeWidth]="6">
+                                </mat-progress-spinner>
+                            </div>
+                            <div class="item" *ngIf="import === expandedImport">
+                                <div *ngFor="let error of getErrorMessages()">
+                                    {{error}}
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </ng-container>
+
+                <tr class="header-row" mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                <tr class="expanded-row" mat-row *matRowDef="let import; columns: displayedColumns;"
+                    [class.example-expanded-row]="expandedImport === import"
+                    (click)="import.finishedSuccess===null||(expandedImport === import && import.finishedSuccess===false) ? expandedImport=null : selectImport(import)"
+                    [ngClass]="expandedImport === import?'selected':''">
+                </tr>
+                <tr mat-row *matRowDef="let row; columns: ['expandedImport']" class="row"></tr>
+            </table>
+        </main>
+    </mat-card>
+</div>

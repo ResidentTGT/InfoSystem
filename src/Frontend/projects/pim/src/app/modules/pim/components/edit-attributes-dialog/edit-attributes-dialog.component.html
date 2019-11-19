@@ -1,0 +1,114 @@
+<div class="edit-attributes-dialog-layout">
+    <div class="loading" *ngIf="loading">
+        <mat-progress-spinner color="accent" mode="indeterminate" [strokeWidth]="8"></mat-progress-spinner>
+    </div>
+
+    <div class="dialog-content">
+        <header>
+            <mat-icon color="accent">edit</mat-icon>
+            <div [matBadge]="products.length" matBadgeOverlap="false" matBadgeColor="accent">Редактирование атрибута для товаров</div>
+        </header>
+
+        <mat-divider></mat-divider>
+
+        <main>
+
+            <mat-form-field class="attr-select">
+                <input #attrFilterInput autocomplete="off" matInput type="text" class="select-attributes-search"
+                       [(ngModel)]="attrFilter" (ngModelChange)="changeAttrFilter(attrFilterSelect)"
+                       (focus)="changeAttrFilter(attrFilterSelect)" (click)="changeAttrFilter(attrFilterSelect)"
+                       (blur)="setAttrFilter()" [placeholder]="attrFilterPlaceholder()">
+                <mat-select #attrFilterSelect [disableOptionCentering]="true"
+                            [(ngModel)]="selectedAttribute" (selectionChange)="changeSelectedAttribute()">
+                    <mat-option *ngFor="let attr of attrOptions" [value]="attr"
+                                (click)="attrFilterInput.focus();attrFilterSelect.close();changeAttrFilter();">
+                        {{attr.name}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+            <div class="attr-value" *ngIf="selectedAttribute" [ngSwitch]="selectedAttribute.type">
+                <div *ngSwitchCase="AttributeType.Boolean">
+                    <mat-checkbox color="accent" (change)="changeAttributeValue($event)"
+                                  [checked]="selectedValue && selectedValue.checked">{{selectedAttribute.name}}</mat-checkbox>
+                </div>
+                <div *ngSwitchCase="AttributeType.Number">
+                    <mat-form-field class="number">
+                        <input matInput autocomplete="off" type="number" placeholder="Значение"
+                               [attr.min]="selectedAttribute.min ? selectedAttribute.min : null"
+                               [attr.max]="selectedAttribute.max ? selectedAttribute.max : null"
+                               (change)="changeAttributeValue($event)" (keyup)="changeAttributeValue($event)">
+                        <mat-hint align="end" *ngIf="selectedAttribute.min || selectedAttribute.max">
+                            <span *ngIf="selectedAttribute.min">от: {{selectedAttribute.min}}</span>
+                            <span *ngIf="selectedAttribute.max">до: {{selectedAttribute.max}}</span>
+                        </mat-hint>
+                    </mat-form-field>
+                </div>
+                <div *ngSwitchCase="AttributeType.String">
+                    <mat-form-field class="string">
+                        <input matInput autocomplete="off" placeholder="Значение"
+                               [attr.minLength]="selectedAttribute.minLength ? selectedAttribute.minLength : null"
+                               [attr.maxLength]="selectedAttribute.maxLength ? selectedAttribute.maxLength : null"
+                               (change)="changeAttributeValue($event)" (keyup)="changeAttributeValue($event)">
+                        <mat-hint align="end" *ngIf="selectedAttribute.minLength || selectedAttribute.maxLength">
+                            <span class="hint-current">
+                                длина: {{selectedValue ? selectedValue.target.value.length : 0}}
+                            </span>
+                            <span *ngIf="selectedAttribute.minLength">мин: {{selectedAttribute.minLength}}</span>
+                            <span *ngIf="selectedAttribute.maxLength">макс: {{selectedAttribute.maxLength}}</span>
+                        </mat-hint>
+                    </mat-form-field>
+                </div>
+                <div *ngSwitchCase="AttributeType.Text">
+                    <mat-form-field class="textarea">
+                        <textarea matInput autocomplete="off" cdkTextareaAutosize cdkAutosizeMinRows="3" cdkAutosizeMaxRows="8"
+                                  placeholder="Значение" #autosize="cdkTextareaAutosize"
+                                  [attr.minLength]="selectedAttribute.minLength ? selectedAttribute.minLength : null"
+                                  [attr.maxLength]="selectedAttribute.maxLength ? selectedAttribute.maxLength : null"
+                                  (change)="changeAttributeValue($event)" (keyup)="changeAttributeValue($event)"></textarea>
+                        <mat-hint align="end" *ngIf="selectedAttribute.minLength || selectedAttribute.maxLength">
+                            <span class="hint-current">
+                                длина: {{selectedValue ? selectedValue.target.value.length : 0}}
+                            </span>
+                            <span *ngIf="selectedAttribute.minLength">мин: {{selectedAttribute.minLength}}</span>
+                            <span *ngIf="selectedAttribute.maxLength">макс: {{selectedAttribute.maxLength}}</span>
+                        </mat-hint>
+                    </mat-form-field>
+                </div>
+                <div *ngSwitchCase="AttributeType.List">
+                    <div *ngIf="attributeList">
+                        <mat-form-field class="select">
+                            <mat-select (selectionChange)="changeAttributeValue($event)" [value]="selectedAttribute.id"
+                                        placeholder="Значение">
+                                <mat-option [value]="null">-</mat-option>
+                                <mat-option *ngFor="let listVal of attributeList.listValues" [value]="listVal">
+                                    {{listVal.value}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div *ngSwitchCase="AttributeType.Date">
+                    <mat-form-field class="date" (click)="picker.open()">
+                        <input matInput autocomplete="off" readonly placeholder="Значение" [matDatepicker]="picker"
+                               [min]="selectedAttribute.minDate ? selectedAttribute.minDate : null"
+                               [max]="selectedAttribute.maxDate ? selectedAttribute.maxDate : null"
+                               (dateInput)="changeAttributeValue($event)">
+                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-datepicker #picker></mat-datepicker>
+                        <mat-hint align="end" *ngIf="selectedAttribute.minDate || selectedAttribute.maxDate">
+                            <span *ngIf="selectedAttribute.minDate">от: {{selectedAttribute.minDate | date:'dd.MM.yyyy'}}</span>
+                            <span *ngIf="selectedAttribute.maxDate">до: {{selectedAttribute.maxDate | date:'dd.MM.yyyy'}}</span>
+                        </mat-hint>
+                    </mat-form-field>
+                </div>
+            </div>
+
+        </main>
+        <mat-divider></mat-divider>
+
+        <footer>
+            <button mat-flat-button color="primary" (click)="updateAttributes()" [disabled]="!isValid">Сохранить</button>
+            <button mat-flat-button color="warn" (click)="closeDialog()">Отмена</button>
+        </footer>
+    </div>
+</div>

@@ -1,0 +1,23 @@
+<div class="loading" *ngIf="loading||auth.loading">
+    <mat-progress-spinner color="primary" mode="indeterminate" [strokeWidth]="8"></mat-progress-spinner>
+</div>
+<form>
+    <mat-form-field>
+        <input matInput placeholder="Логин" [formControl]="loginFormControl" [errorStateMatcher]="matcher">
+        <mat-error *ngIf="loginFormControl.hasError('required')">
+            Поле не может быть пустым
+        </mat-error>
+    </mat-form-field>
+    <mat-form-field>
+        <input matInput placeholder="Пароль" type="password" [formControl]="passwordFormControl" [errorStateMatcher]="matcher">
+        <mat-error *ngIf="passwordFormControl.hasError('required')">
+            Поле не может быть пустым
+        </mat-error>
+    </mat-form-field>
+    <button class="login-local" color="primary" mat-flat-button (click)="loginLocal()">Войти</button>
+    <button class="registration" color="primary" mat-button (click)="register()">Перейти на страницу регистрации</button>
+    <button class="login-microsoft" color="primary" mat-button (click)="auth.loginMicrosoft()">Войти как сотрудник</button>
+    <div class="error">{{error}}</div>
+</form>
+
+<img class="logo" src="assets/super_brands_logo_black_round.png" alt="company" />

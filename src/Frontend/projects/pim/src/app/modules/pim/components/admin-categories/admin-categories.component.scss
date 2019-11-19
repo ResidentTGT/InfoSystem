@@ -1,0 +1,53 @@
+@import '~@angular/material/_theming.scss';
+@import 'projects/pim/src/pim-colors.scss';
+:host {
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
+.layout {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+    .new-category {
+        height: 65px;
+        margin-left: 40px;
+    }
+    .name {
+        width: 300px;
+    }
+    button {
+        &.add,
+        &.save,
+        &.clear,
+        &.settings {
+            transition: 200ms;
+            margin-left: 10px;
+        }
+        &.add,
+        &.save,
+        &.settings {
+            &:hover:not(:disabled) {
+                background: map-get($pim-accent, 100);
+            }
+        }
+        &.clear {
+            &:hover:not(:disabled) {
+                background: map-get($pim-warn, 100);
+            }
+        }
+    }
+}
+
+.loading {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.08);
+}

@@ -1,0 +1,113 @@
+<div class="edit-category-dialog-layout">
+
+    <div class="loading" *ngIf="loading">
+        <mat-progress-spinner color="accent" mode="indeterminate" [strokeWidth]="8"></mat-progress-spinner>
+    </div>
+
+    <div class="dialog-content">
+
+        <header>
+            <div class="title">
+                <mat-icon color="accent">category</mat-icon>
+                <div>Категория: {{category.name}}</div>
+            </div>
+        </header>
+
+        <mat-divider></mat-divider>
+
+        <main>
+
+            <mat-form-field class="filter">
+                <input autocomplete="off" matInput placeholder="Фильтр атрибутов" [(ngModel)]="filterName" (input)="filterChange()">
+            </mat-form-field>
+
+            <div class="table-wrap">
+                <table mat-table matSort [dataSource]="attributesDataSource">
+
+                    <ng-container matColumnDef="checkbox">
+                        <th mat-header-cell class="checkbox" *matHeaderCellDef>
+                            <mat-checkbox color="accent" (change)="masterToggle()" [checked]="selection.hasValue() && isAllSelected()"
+                                          [indeterminate]="selection.hasValue() && !isAllSelected()">
+                            </mat-checkbox>
+                        </th>
+                        <td mat-cell class="checkbox" *matCellDef="let attribute">
+                            <mat-checkbox color="accent" (click)="$event.stopPropagation()" (change)="selectToggle(attribute)"
+                                          [checked]="selection.isSelected(attribute)">
+                            </mat-checkbox>
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="id">
+                        <th mat-header-cell class="id" *matHeaderCellDef>№</th>
+                        <td mat-cell class="id" *matCellDef="let attribute">{{attribute.id}}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="name">
+                        <th mat-header-cell mat-sort-header class="name" *matHeaderCellDef>Атрибут</th>
+                        <td mat-cell class="name" *matCellDef="let attribute">{{attribute.name}}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="required">
+                        <th mat-header-cell class="required" *matHeaderCellDef>Обязательный</th>
+                        <td mat-cell class="required" *matCellDef="let attribute">
+                            <mat-checkbox *ngIf="isRowSelected(attribute.id)" color="accent" [checked]="getIsRequired(attribute.id)"
+                                          (change)="toggleRequired(attribute.id)">
+                            </mat-checkbox>
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="filter-b2b">
+                        <th mat-header-cell class="filter-b2b" *matHeaderCellDef>Фильтр B2B</th>
+                        <td mat-cell class="filter-b2b" *matCellDef="let attribute">
+                            <mat-checkbox *ngIf="isRowSelected(attribute.id)" color="accent" [checked]="getIsFiltered(attribute.id)"
+                                          (change)="toggleFiltered(attribute.id)">
+                            </mat-checkbox>
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="is-visible-b2b">
+                        <th mat-header-cell class="is-visible-b2b" *matHeaderCellDef>Видимость B2B</th>
+                        <td mat-cell class="is-visible-b2b" *matCellDef="let attribute">
+                            <mat-checkbox *ngIf="isRowSelected(attribute.id)" color="accent" [checked]="getIsVisible(attribute.id)"
+                                          (change)="toggleVisible(attribute.id)">
+                            </mat-checkbox>
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="is-key">
+                        <th mat-header-cell class="is-key" *matHeaderCellDef>Ключевой</th>
+                        <td mat-cell class="is-key" *matCellDef="let attribute">
+                            <mat-checkbox *ngIf="isRowSelected(attribute.id)" color="accent" [checked]="getIsKey(attribute.id)"
+                                          (change)="toggleKey(attribute.id)">
+                            </mat-checkbox>
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="level">
+                        <th mat-header-cell mat-sort-header class="level" *matHeaderCellDef>Уровень</th>
+                        <td mat-cell class="level" *matCellDef="let attribute">
+                            <mat-select *ngIf="isRowSelected(attribute.id)" [value]="getModelLevel(attribute.id)"
+                                        (selectionChange)="setModelLevel(attribute.id, $event.value)">
+                                <mat-option *ngFor="let level of levelOptions" [value]="level">
+                                    {{level | modelLevelName}}
+                                </mat-option>
+                            </mat-select>
+                        </td>
+                    </ng-container>
+
+                    <tr class="header" mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr class="category-row" mat-row *matRowDef="let column; columns: displayedColumns;"></tr>
+
+                </table>
+            </div>
+
+        </main>
+
+        <footer>
+            <button mat-flat-button color="primary" (click)="saveCategory()" [disabled]="!selection.selected.length">Сохранить</button>
+            <button mat-flat-button color="warn" (click)="closeDialog()">Отмена</button>
+        </footer>
+
+    </div>
+
+</div>

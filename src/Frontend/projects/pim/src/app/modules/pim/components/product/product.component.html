@@ -1,0 +1,133 @@
+<div class="loading" *ngIf="productLoading">
+    <mat-progress-spinner color="accent" mode="indeterminate" [strokeWidth]="6"></mat-progress-spinner>
+</div>
+<main class="layout">
+    <section class="categories-form">
+        <div class="title">
+            Категория
+        </div>
+        <mat-divider></mat-divider>
+        <mat-tree class="tree" *ngIf="!!categoriesDataSource.data.length" [dataSource]="categoriesDataSource"
+            [treeControl]="treeControl">
+            <mat-tree-node *matTreeNodeDef="let category" matTreeNodePadding>
+                <button mat-icon-button disabled></button>
+                <mat-checkbox color="accent" class="checklist-leaf-node"
+                    [disabled]="!this.isPimResourceEditable(PimResourcePermissionsNames.Categories) "
+                    [checked]="checklistSelection.isSelected(category)"
+                    [ngStyle]="{'font-weight': checklistSelection.isSelected(category)?'600':'400'}"
+                    (change)="selectCategory(category)">{{category.name}}</mat-checkbox>
+            </mat-tree-node>
+
+            <mat-tree-node *matTreeNodeDef="let category;when: hasChild" matTreeNodePadding>
+                <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'toggle ' + category.name">
+                    <mat-icon class="mat-icon-rtl-mirror">
+                        {{treeControl.isExpanded(category) ? 'expand_more' : 'chevron_right'}}
+                    </mat-icon>
+                </button>
+                <mat-checkbox color="accent" (change)="selectCategory(category)"
+                    [disabled]="!this.isPimResourceEditable(PimResourcePermissionsNames.Categories) "
+                    [checked]="checklistSelection.isSelected(category)"
+                    [ngStyle]="{'font-weight': descendantsPartiallySelected(category)||checklistSelection.isSelected(category)?'600':'400'}">
+                    {{category.name}}</mat-checkbox>
+            </mat-tree-node>
+        </mat-tree>
+    </section>
+
+    <mat-divider vertical></mat-divider>
+
+    <section class="product-info">
+        <mat-tab-group color="accent">
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    <mat-icon class="tab-icon">person</mat-icon>
+                    Модель
+                </ng-template>
+                <header class="model">
+                    <section class="main-info">
+                        <mat-form-field>
+                            <input autocomplete="off" matInput placeholder="Наименование"
+                                [formControl]="nameFormControl" [errorStateMatcher]="errorMatcher">
+                            <mat-error *ngIf="nameFormControl.hasError('required')">
+                                Поле не может быть пустым
+                            </mat-error>
+                        </mat-form-field>
+                        <div *ngIf="product&&product.id" class="sku"><strong>SKU:</strong> {{product.sku}}</div>
+                    </section>
+                    <section class="buttons">
+                        <button color="accent" matTooltip="Создать новый товар на основе текущего"
+                            [matTooltipShowDelay]="500" *ngIf="product&&product.id" mat-icon-button
+                            (click)="createOnBaseProduct()">
+                            <mat-icon>add</mat-icon>
+                        </button>
+                        <button *ngIf="product && product.id" color="warn" class="delete" matTooltip="Удалить товар"
+                            (click)="deleteProduct()" [matTooltipShowDelay]="500"
+                            [disabled]="!this.isPimResourceDeletable(PimResourcePermissionsNames.Product)"
+                            mat-icon-button>
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                        <div [matTooltip]="getSaveTooltipMessage()" (click)="saveProduct()" [matTooltipShowDelay]="300">
+                            <button mat-icon-button [color]="isValidProduct() ? 'accent' : 'warn'">
+                                <mat-icon>save</mat-icon>
+                            </button>
+                        </div>
+                    </section>
+                </header>
+
+                <mat-divider></mat-divider>
+
+                <main class="model">
+                    <company-documents [setProduct]="product" (documentsChanged)="changeDocuments($event)" class="company-documents"></company-documents>
+
+                    <mat-divider></mat-divider>
+
+                    <section class="attributes-section">
+                        <mat-divider vertical="true"></mat-divider>
+
+                        <company-attributes [attributesPermissions]="attributesPermissions"
+                            [attributesGroups]="modelAttributesGroups" [setProduct]="product"
+                            [attributesCategories]="getAttributesCategories(ModelLevel.Model)"
+                            (propertiesChanged)="changeProductProperties($event)">
+                        </company-attributes>
+                    </section>
+                </main>
+            </mat-tab>
+
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    <mat-icon class="tab-icon">palette</mat-icon>
+                    Цвето-модели
+                </ng-template>
+
+                <header *ngIf="product" class="color-models">
+
+                    <mat-form-field>
+                        <mat-select [(ngModel)]="selectedColorModel" placeholder="Цвето-модель">
+                            <mat-option [value]="colorModel" *ngFor="let colorModel of product.subProducts">
+                                {{colorModel.id && colorModel.sku ? colorModel.sku + ' - ' + colorModel.name : colorModel.name}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <button color="accent" matTooltip="Добавить цвето-модель" [matTooltipShowDelay]="500"
+                        mat-icon-button (click)="addColorModel()">
+                        <mat-icon>add</mat-icon>
+                    </button>
+                    <button color="warn" class="delete" matTooltip="Удалить цвето-модель"
+                        (click)="deleteColorModel(selectedColorModel)" [disabled]="selectedColorModel===null"
+                        [matTooltipShowDelay]="500" mat-icon-button>
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </header>
+
+                <mat-divider></mat-divider>
+
+                <main class="color-model">
+                    <company-color-model *ngIf="selectedColorModel" [setAttributesPermissions]="attributesPermissions"
+                        [setAttributesGroups]="categoryAttributesGroups" [setAttributesCategories]="attributesCategories"
+                        [setProduct]="selectedColorModel" class="company-color-model"></company-color-model>
+                </main>
+
+            </mat-tab>
+
+        </mat-tab-group>
+    </section>
+</main>

@@ -1,0 +1,57 @@
+<div class="loading" *ngIf="groupsLoading">
+    <mat-progress-spinner color="accent" mode="indeterminate" [strokeWidth]="8"></mat-progress-spinner>
+</div>
+<header>
+    <div class="filter">
+        <mat-form-field>
+            <input autocomplete="off" matInput [(ngModel)]="filter" (input)="filterGroups()" placeholder="Фильтр по названию">
+        </mat-form-field>
+        <button mat-icon-button color="accent" (click)="refreshGroups()"><mat-icon>refresh</mat-icon></button>
+    </div>
+    <div class="buttons">
+        <button color="warn" class="delete" [disabled]="!selection.selected.length" mat-icon-button (click)="deleteGroups()"><mat-icon>delete</mat-icon></button>
+        <button color="accent" mat-icon-button (click)="createAttributeGroup(tableWrap)"><mat-icon>add</mat-icon></button>
+    </div>
+</header>
+<mat-divider></mat-divider>
+<main #tableWrap>
+    <table mat-table [dataSource]="viewAttributesGroups" multiTemplateDataRows>
+
+        <ng-container matColumnDef="select">
+            <th mat-header-cell class="checkbox" *matHeaderCellDef>
+                <mat-checkbox color="accent" (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()"
+                    [indeterminate]="selection.hasValue() && !isAllSelected()">
+                </mat-checkbox>
+            </th>
+            <td mat-cell class="checkbox" *matCellDef="let row">
+                <mat-checkbox color="accent" (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row)  : null" [checked]="selection.isSelected(row)">
+                </mat-checkbox>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="id">
+            <th mat-header-cell class="id" *matHeaderCellDef>#</th>
+            <td mat-cell class="id" *matCellDef="let attributeGroup"> {{attributeGroup.id ? attributeGroup.id : '-'}}
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="name">
+            <th mat-header-cell class="name" *matHeaderCellDef>Название</th>
+            <td mat-cell class="name" *matCellDef="let attributeGroup">
+                <mat-form-field>
+                    <input type="text" autocomplete="off" [(ngModel)]="attributeGroup.name" matInput />
+                </mat-form-field>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="save">
+            <th mat-header-cell class="save" *matHeaderCellDef></th>
+            <td mat-cell class="save" *matCellDef="let attributeGroup">
+                <button color="accent" mat-icon-button (click)="saveAttributeGroup(attributeGroup)" [disabled]="isNullOrWhitespace(attributeGroup.name)"><mat-icon>save</mat-icon></button>
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let attributeGroup; columns: displayedColumns;"></tr>
+    </table>
+</main>

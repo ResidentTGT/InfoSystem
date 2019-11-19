@@ -1,0 +1,86 @@
+<div class="layout">
+
+    <div class="loading" *ngIf="categoriesLoading">
+        <mat-progress-spinner color="accent" mode="indeterminate" [strokeWidth]="8"></mat-progress-spinner>
+    </div>
+
+    <div *ngIf="newCategory" class="new-category">
+        <mat-form-field class="name">
+            <input autocomplete="off" matInput [(ngModel)]="newCategory.name">
+        </mat-form-field>
+        <button mat-icon-button color="accent" class="add" (click)="saveNewCategory()" [disabled]="!newCategory.name">
+            <mat-icon>add</mat-icon>
+        </button>
+    </div>
+
+    <mat-tree *ngIf="!!dataSource.data.length" [dataSource]="dataSource" [treeControl]="treeControl">
+
+        <mat-tree-node *matTreeNodeDef="let category" matTreeNodePadding>
+            <button mat-icon-button disabled></button>
+            <mat-form-field class="name">
+                <span matSuffix>{{category.id ? '#'+category.id: ''}}</span>
+                <input autocomplete="off" matInput [(ngModel)]="category.name">
+            </mat-form-field>
+
+            <button mat-icon-button color="accent" class="settings" (click)="editCategory(category)">
+                <mat-icon>settings</mat-icon>
+            </button>
+            <button mat-icon-button color="accent" class="add" (click)="addCategory(category)">
+                <mat-icon>add</mat-icon>
+            </button>
+            <button mat-icon-button color="accent" class="save" (click)="saveCategory(category, '')" [disabled]="!category.name||!isChanged(category)">
+                <mat-icon>save</mat-icon>
+            </button>
+            <button mat-icon-button class="clear" color="warn" (click)="deleteCategory(category)">
+                <mat-icon>clear</mat-icon>
+            </button>
+        </mat-tree-node>
+
+        <mat-tree-node *matTreeNodeDef="let category; when: hasNoContent" matTreeNodePadding>
+            <button mat-icon-button disabled></button>
+            <mat-form-field class="name">
+                <span matSuffix>{{category.id ? '#'+category.id: ''}}</span>
+                <input autocomplete="off" matInput #newCategoryInput placeholder="Новая категория">
+            </mat-form-field>
+            <button mat-icon-button color="accent" class="settings" (click)="editCategory(category)">
+                <mat-icon>settings</mat-icon>
+            </button>
+            <button mat-icon-button color="accent" class="add" (click)="addCategory(category)" [disabled]="!category.id">
+                <mat-icon>add</mat-icon>
+            </button>
+            <button mat-icon-button color="accent" class="save" (click)="saveCategory(category, newCategoryInput.value)"
+                [disabled]="!newCategoryInput.value">
+                <mat-icon>save</mat-icon>
+            </button>
+            <button mat-icon-button class="clear" color="warn" color="warn" (click)="deleteCategory(category)">
+                <mat-icon>clear</mat-icon>
+            </button>
+        </mat-tree-node>
+
+        <mat-tree-node *matTreeNodeDef="let category; when: hasChild" matTreeNodePadding>
+            <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'toggle ' + category.name">
+                <mat-icon class="mat-icon-rtl-mirror">
+                    {{treeControl.isExpanded(category) ? 'expand_more' : 'chevron_right'}}
+                </mat-icon>
+            </button>
+            <mat-form-field class="name">
+                <span matSuffix>{{category.id ? '#'+category.id: ''}}</span>
+                <input autocomplete="off" matInput [(ngModel)]="category.name">
+            </mat-form-field>
+            <button mat-icon-button color="accent" class="settings" (click)="editCategory(category)">
+                <mat-icon>settings</mat-icon>
+            </button>
+            <button mat-icon-button class="add" (click)="addCategory(category)">
+                <mat-icon>add</mat-icon>
+            </button>
+            <button mat-icon-button (click)="saveCategory(category, '')" class="save" [disabled]="!category.name||!isChanged(category)">
+                <mat-icon>save</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" class="clear" (click)="deleteCategory(category)">
+                <mat-icon>clear</mat-icon>
+            </button>
+        </mat-tree-node>
+
+    </mat-tree>
+
+</div>

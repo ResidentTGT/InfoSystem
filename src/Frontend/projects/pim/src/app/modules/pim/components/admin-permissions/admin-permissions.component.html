@@ -1,0 +1,64 @@
+<div class="loading" *ngIf="rolesLoading">
+    <mat-progress-spinner color="accent" mode="indeterminate" [strokeWidth]="8"></mat-progress-spinner>
+</div>
+<header>
+    <mat-form-field>
+        <mat-select placeholder="Роль" (selectionChange)="loadResourcePermissions()" [(ngModel)]="currentRole">
+            <mat-option *ngFor="let role of roles" [value]="role">
+                {{role.name}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+</header>
+<mat-divider></mat-divider>
+<main>
+    <div class="loading" *ngIf="resourcePermissionsLoading">
+        <mat-progress-spinner color="accent" mode="indeterminate" [strokeWidth]="8"></mat-progress-spinner>
+    </div>
+    <mat-tab-group *ngIf="currentRole">
+        <mat-tab label="Доступ к разделам">
+            <div class="sections">
+                <div class="section">
+                    <div class="name title">Раздел</div>
+                    <div class="action title">
+                        <div>Доступ</div>
+                    </div>
+                </div>
+                <div>
+                    <div class="section" *ngFor="let section of PimSectionPermissionsNames">
+                        <div class="name">{{section}}</div>
+                        <div class="action">
+                            <mat-checkbox [checked]="isExistSectionPermission(section)" [disabled]="sectionLoading"
+                                (change)="changeSectionPermission($event,section)"></mat-checkbox>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </mat-tab>
+        <mat-tab label="Действия">
+
+            <div class="actions" *ngIf="resourcePermissionsNames">
+                <div class="item">
+                    <div class="section title">Раздел</div>
+                    <div class="action title">Чтение</div>
+                    <div class="action title">Изменение</div>
+                    <div class="action title">Добавление</div>
+                    <div class="action title">Удаление</div>
+                </div>
+                <div>
+                    <div class="item" *ngFor="let perm of resourcePermissionsNames">
+                        <div class="section">{{perm}}</div>
+                        <mat-checkbox class="action" [disabled]="resourceLoading" [checked]="isExistResourcePermission(perm,ResourceAccessMethods.Read)"
+                            (change)="changeResourcePermission($event,perm,ResourceAccessMethods.Read)"></mat-checkbox>
+                        <mat-checkbox class="action" [disabled]="resourceLoading" [checked]="isExistResourcePermission(perm,ResourceAccessMethods.Modify)"
+                            (change)="changeResourcePermission($event,perm,ResourceAccessMethods.Modify)"></mat-checkbox>
+                        <mat-checkbox class="action" [disabled]="resourceLoading" [checked]="isExistResourcePermission(perm,ResourceAccessMethods.Add)"
+                            (change)="changeResourcePermission($event,perm,ResourceAccessMethods.Add)"></mat-checkbox>
+                        <mat-checkbox class="action" [disabled]="resourceLoading" [checked]="isExistResourcePermission(perm,ResourceAccessMethods.Delete)"
+                            (change)="changeResourcePermission($event,perm,ResourceAccessMethods.Delete)"></mat-checkbox>
+                    </div>
+                </div>
+            </div>
+        </mat-tab>
+    </mat-tab-group>
+</main>

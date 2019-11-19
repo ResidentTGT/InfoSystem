@@ -1,0 +1,19 @@
+<div class="unauthorized-dialog-layout">
+    <header>
+        <mat-icon color="warn">error</mat-icon>
+        <div>Вы не авторизованы!</div>
+    </header>
+    <main>
+        <div>
+            {{errorMessage}}
+        </div>
+        <div *ngIf="info">
+            {{info}}
+        </div>
+    </main>
+    <mat-divider></mat-divider>
+    <footer>
+        <button mat-button color="warn" (click)="closeDialog()">Закрыть</button>
+        <button mat-flat-button color="primary" (click)="redirectToLogin()">Авторизоваться</button>
+    </footer>
+</div>

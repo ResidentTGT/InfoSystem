@@ -1,0 +1,91 @@
+<div class="loading" *ngIf="attributesLoading">
+    <mat-progress-spinner color="accent" mode="indeterminate" [strokeWidth]="8"></mat-progress-spinner>
+</div>
+<header>
+    <div class="filter">
+        <mat-form-field>
+            <input matInput [(ngModel)]="filter" (input)="filterAttributes()" placeholder="Фильтр по названию">
+        </mat-form-field>
+        <button mat-icon-button color="accent" (click)="refreshAttributes()">
+            <mat-icon>refresh</mat-icon>
+        </button>
+    </div>
+    <div class="buttons">
+        <button color="warn" class="delete" [disabled]="!selection.selected.length" mat-icon-button
+                (click)="deleteAttributes()">
+            <mat-icon>delete</mat-icon>
+        </button>
+        <button color="accent" mat-icon-button (click)="createAttribute(tableWrap)">
+            <mat-icon>add</mat-icon>
+        </button>
+    </div>
+</header>
+<mat-divider></mat-divider>
+<main #tableWrap>
+    <table mat-table matSort [dataSource]="viewAttributes" multiTemplateDataRows>
+
+        <ng-container matColumnDef="select">
+            <th mat-header-cell class="checkbox" *matHeaderCellDef>
+                <mat-checkbox color="accent" (change)="$event ? masterToggle() : null"
+                              [checked]="selection.hasValue() && isAllSelected()"
+                              [indeterminate]="selection.hasValue() && !isAllSelected()">
+                </mat-checkbox>
+            </th>
+            <td mat-cell class="checkbox" *matCellDef="let row">
+                <mat-checkbox color="accent" (click)="$event.stopPropagation()"
+                              (change)="$event ? selection.toggle(row)  : null" [checked]="selection.isSelected(row)">
+                </mat-checkbox>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="id">
+            <th mat-header-cell mat-sort-header class="id" *matHeaderCellDef>#</th>
+            <td mat-cell class="id" *matCellDef="let attribute"> {{attribute.id ? attribute.id : '-'}}
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="name">
+            <th mat-header-cell mat-sort-header class="name" *matHeaderCellDef>Название</th>
+            <td mat-cell class="name" *matCellDef="let attribute"> {{attribute.name ? attribute.name : '-'}}
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="groupId">
+            <th mat-header-cell mat-sort-header class="group" *matHeaderCellDef>Группа</th>
+            <td mat-cell class="group" *matCellDef="let attribute"> {{attribute.groupId ?
+                getAttributeGroupName(attribute.groupId):
+                '-'}}
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="type">
+            <th mat-header-cell mat-sort-header class="type" *matHeaderCellDef>Тип</th>
+            <td mat-cell class="type" *matCellDef="let attribute"> {{attribute.type ? (attribute.type|attributeType) :
+                '-'}}
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="expandedAttribute">
+            <td mat-cell *matCellDef="let attribute" [attr.colspan]="displayedColumns.length">
+                <div class="attribute" [@attributeExpand]="attribute == expandedAttribute ? 'expanded' : 'collapsed'">
+                    <company-admin-attribute *ngIf="attribute == expandedAttribute" [attribute]="attribute"
+                                        [attributesGroups]="attributesGroups" [attributesLists]="attributesLists"
+                                        [categories]="categories" [roles]="roles" (attributeChanged)="changeAttribute($event)"
+                                        (attributeSaved)="saveAttribute($event)" class="company-admin-attribute">
+                    </company-admin-attribute>
+                </div>
+            </td>
+        </ng-container>
+
+        <tr class="header-row" mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr class="expanded-row" mat-row *matRowDef="let attribute; columns: displayedColumns;"
+            [class.example-expanded-row]="expandedAttribute === attribute"
+            (click)="expandedAttribute === attribute ? expandedAttribute=null : expandedAttribute=attribute"
+            [ngClass]="{
+                'selected': expandedAttribute === attribute,
+                'not-saved': !attribute.id || changedAttributes.includes(attribute.id)
+            }">
+        </tr>
+        <tr mat-row *matRowDef="let row; columns: ['expandedAttribute']" class="row"></tr>
+    </table>
+</main>

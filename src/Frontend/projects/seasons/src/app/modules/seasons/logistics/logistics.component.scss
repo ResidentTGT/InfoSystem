@@ -1,0 +1,153 @@
+@import '~@angular/material/_theming.scss';
+@import 'projects/seasons/src/seasons-colors.scss';
+:host {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.layout {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    .main-card {
+        width: 620px;
+        position: relative;
+        height: calc(100% - 40px);
+        align-self: center;
+        padding: 0;
+    }
+}
+
+.loading {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.06);
+}
+
+header {
+    position: relative;
+    width: 100%;
+    height: 65px;
+    .mat-form-field {
+        margin-left: 20px;
+        width: 200px;
+        padding-top: 5px;
+    }
+}
+
+.mat-divider {
+    z-index: 800;
+}
+
+main {
+    position: relative;
+    width: 100%;
+    height: calc(100% - 66px);
+    overflow-y: auto;
+    section:not(:last-child) {
+        display: flex;
+        padding: 0 20px;
+        div {
+            align-self: center;
+        }
+        .mat-form-field {
+            width: 100px;
+            margin: 0 20px;
+        }
+    }
+    .add-factor,
+    .insurance {
+        .slider {
+            display: flex;
+            margin-left: 10px;
+            .limit {
+                align-self: center;
+            }
+            .mat-slider {
+                width: 200px;
+            }
+        }
+        .name {
+            width: 255px;
+        }
+        .value {
+            margin-left: 15px;
+        }
+    }
+    .supplies {
+        width: calc(100% - 40px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        .title {
+            font-size: 16px;
+            font-weight: 500;
+            margin: 0 0 15px 0;
+        }
+        .mat-card {
+            width: 100%;
+            padding: 0;
+            margin-bottom: 15px;
+            .delete {
+                position: absolute;
+                right: 10px;
+                top: 10px;
+                transition: 200ms;
+                &:hover:not(:disabled) {
+                    background: map-get($seasons-warn, 100);
+                }
+            }
+            section {
+                display: flex;
+                padding-left: 20px;
+                div {
+                    align-self: center;
+                }
+                .mat-form-field {
+                    width: 100px;
+                    margin: 0 20px;
+                    &.date {
+                        width: 220px;
+                        margin: 0 20px 0 0;
+                    }
+                }
+                .slider {
+                    display: flex;
+                    margin-left: 20px;
+                    .limit {
+                        align-self: center;
+                    }
+                    .mat-slider {
+                        width: 200px;
+                    }
+                    .value {
+                        margin-left: 15px;
+                    }
+                }
+                .risk {
+                    width: 35px;
+                }
+            }
+        }
+        .add {
+            transition: 200ms;
+            background: map-get($seasons-accent, 50);
+            &:hover:not(:disabled) {
+                background: map-get($seasons-accent, 100);
+            }
+        }
+    }
+    .save {
+        margin: 15px 20px;
+        width: calc(100% - 40px);
+    }
+}

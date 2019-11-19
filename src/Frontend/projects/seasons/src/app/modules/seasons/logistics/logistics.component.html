@@ -1,0 +1,139 @@
+<div class="layout">
+    <mat-card class="main-card">
+        <div class="loading" *ngIf="loading">
+            <mat-progress-spinner color="accent" mode="indeterminate" [strokeWidth]="6"></mat-progress-spinner>
+        </div>
+        <header>
+            <mat-form-field>
+                <mat-select (selectionChange)="loadLogistics()" [(ngModel)]="brand" placeholder="Бренд">
+                    <mat-option *ngFor="let brand of brandsList.listValues" [value]="brand">{{brand.value}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-select (selectionChange)="loadLogistics()" [(ngModel)]="season" placeholder="Сезон">
+                    <mat-option *ngFor="let season of seasonsList.listValues" [value]="season">{{season.value}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </header>
+        <mat-divider></mat-divider>
+        <main *ngIf="logistics">
+            <section>
+                <div>Объем закупки:</div>
+                <mat-form-field>
+                    <input autocomplete="off" matInput type="number" [(ngModel)]="logistics.productsVolume">
+                    <div matSuffix>ед.</div>
+                </mat-form-field>
+                <div>Объем закупки:</div>
+                <mat-form-field>
+                    <input autocomplete="off" matInput type="number" [(ngModel)]="logistics.moneyVolume">
+                    <div matSuffix>у.е.</div>
+                </mat-form-field>
+            </section>
+            <section>
+                <div>Количество партий:</div>
+                <mat-form-field>
+                    <input autocomplete="off" matInput type="number" [(ngModel)]="logistics.batchesCount">
+                </mat-form-field>
+            </section>
+            <section class="add-factor">
+                <div class="name">Наценка за неучтенные расходы:</div>
+                <div class="slider">
+                    <div class="limit">0</div>
+                    <mat-slider [max]="100" [tickInterval]="0.5" [min]="0" [step]="0.5" [thumbLabel]="true" [(ngModel)]="logistics.additionalFactor">
+                    </mat-slider>
+                    <div class="limit">100</div>
+                    <div class="value"> {{logistics.additionalFactor ? logistics.additionalFactor : 0}}%</div>
+                </div>
+            </section>
+            <section>
+                <div>Прочие добавочные:</div>
+                <mat-form-field>
+                    <input autocomplete="off" matInput type="number" [(ngModel)]="logistics.otherAdditional">
+                    <div matSuffix>у.е.</div>
+                </mat-form-field>
+            </section>
+            <section class="insurance">
+                <div class="name">Страховка:</div>
+                <div class="slider">
+                    <div class="limit">0</div>
+                    <mat-slider [max]="100" [tickInterval]="0.5" [min]="0" [step]="0.5" [thumbLabel]="true" [(ngModel)]="logistics.insurance">
+                    </mat-slider>
+                    <div class="limit">100</div>
+                    <div class="value"> {{logistics.insurance ? logistics.insurance : 0}}%</div>
+                </div>
+            </section>
+            <section class="supplies">
+                <div class="title">Поставки</div>
+                <mat-card *ngFor="let supply of logistics.supplies">
+                    <button color="warn" class="delete" (click)="deleteSupply(supply)" mat-icon-button>
+                        <mat-icon>clear</mat-icon>
+                    </button>
+                    <section>
+                        <div>Количество партий:</div>
+                        <mat-form-field>
+                            <input autocomplete="off" matInput type="number" [(ngModel)]="supply.batchesCount">
+                        </mat-form-field>
+                    </section>
+                    <section>
+                        <div>Транспортные расходы:</div>
+                        <mat-form-field>
+                            <input autocomplete="off" matInput type="number" [(ngModel)]="supply.transportCost">
+                            <div matSuffix>у.е.</div>
+                        </mat-form-field>
+                    </section>
+                    <section>
+                        <mat-form-field class="date" (click)="picker1.open()">
+                            <input autocomplete="off" matInput readonly [(ngModel)]="supply.fabricDate" [matDatepicker]="picker1"
+                                placeholder="Дата выхода с фабрики">
+                            <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                            <mat-datepicker #picker1></mat-datepicker>
+                        </mat-form-field>
+                        <mat-form-field class="date" (click)="picker2.open()">
+                            <input autocomplete="off" matInput readonly [(ngModel)]="supply.deliveryDate"
+                                [matDatepicker]="picker2" placeholder="Дата прихода товара">
+                            <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                            <mat-datepicker #picker2></mat-datepicker>
+                        </mat-form-field>
+                    </section>
+                    <section>
+                        <div>Брокер:</div>
+                        <mat-form-field>
+                            <input autocomplete="off" matInput type="number" [(ngModel)]="supply.brokerCost">
+                            <div matSuffix>у.е.</div>
+                        </mat-form-field>
+                    </section>
+                    <section>
+                        <div>СВХ:</div>
+                        <mat-form-field>
+                            <input autocomplete="off" matInput type="number" [(ngModel)]="supply.wtsCost">
+                            <div matSuffix>у.е.</div>
+                        </mat-form-field>
+                    </section>
+                    <section>
+                        <div class="risk">Риск:</div>
+                        <div class="slider">
+                            <div class="limit">0</div>
+                            <mat-slider [max]="100" [tickInterval]="0.5" [min]="0" [step]="0.5" [thumbLabel]="true"
+                                [(ngModel)]="supply.riskCoefficient">
+                            </mat-slider>
+                            <div class="limit">100</div>
+                            <div class="value"> {{supply.riskCoefficient ? supply.riskCoefficient : 0}}%</div>
+                        </div>
+                    </section>
+                    <section>
+                        <div>Прочее:</div>
+                        <mat-form-field>
+                            <input autocomplete="off" matInput type="number" [(ngModel)]="supply.other">
+                            <div matSuffix>у.е.</div>
+                        </mat-form-field>
+                    </section>
+                </mat-card>
+                <button color="accent" class="add" (click)="addSupply()" mat-icon-button>
+                    <mat-icon>add</mat-icon>
+                </button>
+            </section>
+            <button class="save" [disabled]="!isValidForm()" (click)="saveLogistics()" mat-stroked-button color="accent">Сохранить
+                параметры логистики</button>
+        </main>
+    </mat-card>
+</div>

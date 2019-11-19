@@ -1,0 +1,117 @@
+<div class="attributes-form">
+
+    <mat-accordion #accordion="matAccordion" multi="true">
+        <mat-expansion-panel [expanded]="true"
+            *ngFor="let attrGroup of attributesGroups">
+            <mat-expansion-panel-header [collapsedHeight]="'50px'" [expandedHeight]="'50px'">
+                <mat-panel-title>
+                    {{attrGroup.name}}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="attribute"
+                *ngFor="let attr of attrGroup.attributes">
+                <div class="name">{{attr.name}}</div>
+                <div class="value" [ngSwitch]="attr.type">
+                    <div *ngSwitchCase="AttributeType.Boolean">
+                        <mat-checkbox color="accent" (change)="changeAttributeValue(attr.id,$event)"
+                            [checked]="getAttributeValue(attr.id)" [disabled]="!isAttributeEditable(attr.id)">
+                        </mat-checkbox>
+                    </div>
+                    <div *ngSwitchCase="AttributeType.Number">
+                        <mat-form-field class="number">
+                            <input matInput type="number" autocomplete="off" [value]="getAttributeValue(attr.id)"
+                                [disabled]="!isAttributeEditable(attr.id)" [attr.min]="attr.min ? attr.min : null"
+                                [attr.max]="attr.max ? attr.max : null" (change)="changeAttributeValue(attr.id,$event)"
+                                (keyup)="changeAttributeValue(attr.id,$event)">
+                            <mat-hint align="end" *ngIf="attr.min || attr.max">
+                                <span *ngIf="attr.min">от: {{attr.min}}</span>
+                                <span *ngIf="attr.max">до: {{attr.max}}</span>
+                            </mat-hint>
+                        </mat-form-field>
+                        <div class="required-star" *ngIf="isRequiredAttribute(attr.id)"
+                            [ngClass]="{'required-filled': getAttributeValue(attr.id)}">*</div>
+                    </div>
+                    <div *ngSwitchCase="AttributeType.String">
+                        <mat-form-field class="string">
+                            <input matInput autocomplete="off" [value]="getAttributeValue(attr.id)"
+                                [disabled]="!isAttributeEditable(attr.id)"
+                                [attr.minLength]="attr.minLength ? attr.minLength : null"
+                                [attr.maxLength]="attr.maxLength ? attr.maxLength : null"
+                                (change)="changeAttributeValue(attr.id,$event)"
+                                (keyup)="changeAttributeValue(attr.id,$event)">
+                            <mat-hint align="end" *ngIf="attr.minLength || attr.maxLength">
+                                <span class="hint-current">
+                                    длина: {{getAttributeValue(attr.id) ? getAttributeValue(attr.id).length : 0}}
+                                </span>
+                                <span *ngIf="attr.minLength">мин: {{attr.minLength}}</span>
+                                <span *ngIf="attr.maxLength">макс: {{attr.maxLength}}</span>
+                            </mat-hint>
+                            <mat-hint align="end" *ngIf="!isValidTemplate(attr)">
+                                шаблон: {{attr.template}}
+                            </mat-hint>
+                        </mat-form-field>
+                        <div class="required-star" *ngIf="isRequiredAttribute(attr.id)"
+                            [ngClass]="{'required-filled': getAttributeValue(attr.id)}">*</div>
+                    </div>
+                    <div *ngSwitchCase="AttributeType.Text">
+                        <mat-form-field class="textarea">
+                            <textarea matInput autocomplete="off" cdkTextareaAutosize cdkAutosizeMinRows="3"
+                                cdkAutosizeMaxRows="8" [value]="getAttributeValue(attr.id)"
+                                [disabled]="!isAttributeEditable(attr.id)" #autosize="cdkTextareaAutosize"
+                                [attr.minLength]="attr.minLength ? attr.minLength : null"
+                                [attr.maxLength]="attr.maxLength ? attr.maxLength : null"
+                                (change)="changeAttributeValue(attr.id,$event)"
+                                (keyup)="changeAttributeValue(attr.id,$event)"></textarea>
+                            <mat-hint align="end" *ngIf="attr.minLength || attr.maxLength">
+                                <span class="hint-current">
+                                    длина: {{getAttributeValue(attr.id) ? getAttributeValue(attr.id).length : 0}}
+                                </span>
+                                <span *ngIf="attr.minLength">мин: {{attr.minLength}}</span>
+                                <span *ngIf="attr.maxLength">макс: {{attr.maxLength}}</span>
+                            </mat-hint>
+                        </mat-form-field>
+                        <div class="required-star" *ngIf="isRequiredAttribute(attr.id)"
+                            [ngClass]="{'required-filled': getAttributeValue(attr.id)}">*</div>
+                    </div>
+                    <div *ngSwitchCase="AttributeType.List">
+                        <mat-form-field class="select">
+                            <mat-select [disabled]="!isAttributeEditable(attr.id)"
+                                (selectionChange)="changeAttributeValue(attr.id,$event)"
+                                [value]="getAttributeValue(attr.id)">
+                                <mat-option [value]="null">-</mat-option>
+                                <mat-option *ngFor="let listVal of getList(attr.listId)" [value]="listVal.id">
+                                    {{listVal.value}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <div class="required-star" *ngIf="isRequiredAttribute(attr.id)"
+                            [ngClass]="{'required-filled': getAttributeValue(attr.id)}">*</div>
+                    </div>
+                    <div *ngSwitchCase="AttributeType.Date">
+                        <mat-form-field class="date" (click)="picker.open()">
+                            <input matInput autocomplete="off" readonly [matDatepicker]="picker"
+                                [min]="attr.minDate ? attr.minDate : null" [max]="attr.maxDate ? attr.maxDate : null"
+                                [disabled]="!isAttributeEditable(attr.id)" [value]="getAttributeValue(attr.id)"
+                                (dateInput)="changeAttributeValue(attr.id,$event)">
+                            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                            <mat-datepicker #picker></mat-datepicker>
+                            <mat-hint align="end" *ngIf="attr.minDate || attr.maxDate">
+                                <span *ngIf="attr.minDate">от: {{attr.minDate | date:'dd.MM.yyyy'}}</span>
+                                <span *ngIf="attr.maxDate">до: {{attr.maxDate | date:'dd.MM.yyyy'}}</span>
+                            </mat-hint>
+                        </mat-form-field>
+                        <div class="required-star" *ngIf="isRequiredAttribute(attr.id)"
+                            [ngClass]="{'required-filled': getAttributeValue(attr.id)}">*</div>
+                    </div>
+                </div>
+            </div>
+        </mat-expansion-panel>
+    </mat-accordion>
+    <button *ngIf="isAnyGroupVisible()" class="hide-expand-buttons first" (click)="accordion.closeAll()"
+        mat-icon-button>
+        <mat-icon>unfold_less</mat-icon>
+    </button>
+    <button *ngIf="isAnyGroupVisible()" class="hide-expand-buttons second" (click)="accordion.openAll()"
+        mat-icon-button>
+        <mat-icon>unfold_more</mat-icon>
+    </button>
+</div>

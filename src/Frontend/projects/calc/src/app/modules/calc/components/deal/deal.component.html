@@ -1,0 +1,296 @@
+<div class="layout">
+    <div class="loading" *ngIf="dealLoading">
+        <mat-progress-spinner color="accent" mode="indeterminate" [strokeWidth]="8"></mat-progress-spinner>
+    </div>
+    <main>
+        <section *ngIf="!deal.id&&!dealLoading" class="order-form-input">
+            <input accept="*" id="orderForm" type="file" class="input-file"
+                (change)="loadOrderForm($event.target.files)">
+            <label *ngIf="!deal.id" for="orderForm">Загрузите заказную форму</label>
+            <div class="name" *ngIf="orderForm"><span>Заказная форма:</span> {{orderForm.name}}</div>
+        </section>
+        <section class="deal-info" *ngIf="deal.id">
+            <div class="title">Информация</div>
+            <div class="partner-name">Имя партнера на рынке: {{deal.partnerNameOnMarket}}</div>
+            <div class="contractor">Контрагент: {{deal.contractor}}</div>
+            <div class="brand">Бренд: {{deal.brand}} , сезон: {{getSeason()}}</div>
+            <div class="volume">Сумма сделки: {{deal.volume}} {{deal.currency ? deal.currency: 'у.е.'}} (кол-во товаров:
+                {{deal.totalProductsCount}})</div>
+        </section>
+
+        <mat-divider *ngIf="deal.id"></mat-divider>
+
+        <section class="discount-params" *ngIf="deal.id">
+
+            <div class="title">Параметры скидки</div>
+
+            <div class="order-contract-type">
+
+                <mat-form-field class="order-type">
+                    <mat-select placeholder="Тип заказа" required [formControl]="orderTypeFormControl"
+                        [errorStateMatcher]="matcher" (selectionChange)="calculateSliderParams()"
+                        [(ngModel)]="deal.discountParams.orderType"
+                        [disabled]="!isDealNotConfirmed()||!isUserManager()||isExistHeadOrCeoDiscountRequest()">
+                        <mat-option [value]="OrderType.PreOrder">Предзаказ</mat-option>
+                        <mat-option [value]="OrderType.CurrentFreeWarehouse">Свободный склад (текущий)</mat-option>
+                        <mat-option [value]="OrderType.PastFreeWarehouse">Свободный склад (прошлых сезонов)</mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field class="contract-type">
+                    <mat-select placeholder="Тип договора" required [formControl]="contractTypeFormControl"
+                        [errorStateMatcher]="matcher" (selectionChange)="calculateSliderParams()"
+                        [disabled]="!isDealNotConfirmed()||!isUserManager()||isExistHeadOrCeoDiscountRequest()"
+                        [(ngModel)]="deal.discountParams.contractType">
+                        <mat-option *ngIf="deal.discountParams.commissionContract" [value]="ContractType.Comission">
+                            Комиссия</mat-option>
+                        <mat-option *ngIf="deal.discountParams.implementationContract" [value]="ContractType.Sale">
+                            Купля-продажа</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+
+            <div class="installment-prepayment" *ngIf="deal.id">
+
+                <mat-form-field class="product-type">
+                    <mat-select placeholder="Тип товара"
+                        [disabled]="!isDealNotConfirmed()||!isUserManager()||isExistHeadOrCeoDiscountRequest()"
+                        [(ngModel)]="deal.productType">
+                        <mat-option [value]="ProductType.Product">Товар</mat-option>
+                        <mat-option [value]="ProductType.Sample">Образец</mat-option>
+                        <mat-option [value]="ProductType.SampleNotForSale">Образец не для продажи</mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field class="prepayment">
+                    <input placeholder="Предоплата" autocomplete="off" (input)="calculateSliderParams()" type="number"
+                        [min]="calcParams.prepaymentLimit" [max]="100" matInput [formControl]="prepaymentFormControl"
+                        [errorStateMatcher]="matcher">
+                    <mat-error class="prepayment-error"
+                        *ngIf="prepaymentFormControl.hasError('required')||prepaymentFormControl.hasError('max')||prepaymentFormControl.hasError('min')">
+                        Значение должно быть не менее {{calcParams.prepaymentLimit}}% и не более 100%
+                    </mat-error>
+                    <div matSuffix>%</div>
+                </mat-form-field>
+
+                <mat-form-field class="installment">
+                    <mat-select placeholder="Рассрочка"
+                        [disabled]="!isDealNotConfirmed()||!isUserManager()||isExistHeadOrCeoDiscountRequest()"
+                        (selectionChange)="calculateSliderParams()" [(ngModel)]="deal.discountParams.installment"
+                        [value]="0">
+                        <mat-option [value]="0">{{0*30}}</mat-option>
+                        <mat-option [value]="1">{{1*30}}</mat-option>
+                        <mat-option [value]="2">{{2*30}}</mat-option>
+                        <mat-option [value]="3">{{3*30}}</mat-option>
+                        <mat-option [value]="4">{{4*30}}</mat-option>
+                        <mat-option [value]="5">{{5*30}}</mat-option>
+                        <mat-option [value]="6">{{6*30}}</mat-option>
+                    </mat-select>
+                    <div matSuffix>календ. дней</div>
+                </mat-form-field>
+
+            </div>
+        </section>
+        <section class="discounts" *ngIf="deal.id">
+            <div class="head-discount">
+                <div class="title">Скидка руководителя, %</div>
+                <mat-form-field>
+                    <input (input)="calculateSliderParams()" autocomplete="off" type="number" matInput
+                        [disabled]="!isDealNotConfirmed()||!isEditableDiscount(ReceiverType.Head)"
+                        [(ngModel)]="deal.headDiscount">
+                </mat-form-field>
+                <button class="action-button add-discount" mat-icon-button color="accent"
+                    *ngIf="isDealNotConfirmed()&&isCreatableDiscount(ReceiverType.Head)"
+                    [disabled]="!isValidDiscountParams()||!deal.headDiscount||deal.headDiscount<=0||!deal.delivery"
+                    (click)="requestDiscount(ReceiverType.Head)" [matTooltipShowDelay]="500"
+                    matTooltip="Запросить скидку у руководителя">
+                    <mat-icon>add</mat-icon>
+                </button>
+                <ng-container *ngIf="isExistDiscountRequest(ReceiverType.Head)"
+                    [ngSwitch]="getDiscountRequest(ReceiverType.Head).confirmed">
+                    <mat-icon class="status confirmed" matTooltip="Скидка подтверждена" *ngSwitchCase="true">done
+                    </mat-icon>
+                    <mat-icon class="status in-process" matTooltip="Скидка ожидает подтверждения" *ngSwitchCase="null">
+                        cached</mat-icon>
+                    <mat-icon class="status rejected" matTooltip="Скидка отклонена" *ngSwitchCase="false">block
+                    </mat-icon>
+                </ng-container>
+                <button class="action-button confirm-discount" mat-icon-button
+                    *ngIf="isDealNotConfirmed()&&isModifyableDiscount(ReceiverType.Head)&&getDiscountRequest(ReceiverType.Head).confirmed===null"
+                    (click)="editDiscount(ReceiverType.Head,true)" matTooltip="Подтвердить запрошенную скидку">
+                    <mat-icon>done</mat-icon>
+                </button>
+                <button class="action-button reject-discount" mat-icon-button
+                    *ngIf="isDealNotConfirmed()&&isModifyableDiscount(ReceiverType.Head)&&getDiscountRequest(ReceiverType.Head).confirmed===null"
+                    (click)="editDiscount(ReceiverType.Head,false)" matTooltip="Отклонить запрошенную скидку">
+                    <mat-icon>block</mat-icon>
+                </button>
+            </div>
+            <div class="ceo-discount">
+                <div class="title">Скидка ген. директора, %</div>
+                <mat-form-field>
+                    <input (input)="calculateSliderParams()" type="number" matInput autocomplete="off"
+                        [disabled]="!isDealNotConfirmed()||!isEditableDiscount(ReceiverType.Ceo)"
+                        [(ngModel)]="deal.ceoDiscount">
+                </mat-form-field>
+                <button class="action-button add-discount" mat-icon-button color="accent"
+                    *ngIf="isDealNotConfirmed() && isCreatableDiscount(ReceiverType.Ceo)"
+                    [disabled]="!isValidDiscountParams()||!deal.ceoDiscount || deal.ceoDiscount<=0||!deal.delivery"
+                    (click)="requestDiscount(ReceiverType.Ceo)" [matTooltipShowDelay]="500"
+                    matTooltip="Запросить скидку у ген. директора">
+                    <mat-icon>add</mat-icon>
+                </button>
+                <ng-container *ngIf="isExistDiscountRequest(ReceiverType.Ceo)"
+                    [ngSwitch]="getDiscountRequest(ReceiverType.Ceo).confirmed">
+                    <mat-icon class="status confirmed" matTooltip="Скидка подтверждена" *ngSwitchCase="true">done
+                    </mat-icon>
+                    <mat-icon class="status in-process" matTooltip="Скидка ожидает подтверждения" *ngSwitchCase="null">
+                        cached</mat-icon>
+                    <mat-icon class="status rejected" matTooltip="Скидка отклонена" *ngSwitchCase="false">block
+                    </mat-icon>
+                </ng-container>
+                <button class="action-button confirm-discount" mat-icon-button
+                    *ngIf="isDealNotConfirmed() && isModifyableDiscount(ReceiverType.Ceo) && getDiscountRequest(ReceiverType.Ceo).confirmed===null"
+                    (click)="editDiscount(ReceiverType.Ceo,true)" matTooltip="Подтвердить запрошенную скидку">
+                    <mat-icon>done</mat-icon>
+                </button>
+                <button class="action-button reject-discount" mat-icon-button
+                    *ngIf="isDealNotConfirmed() && isModifyableDiscount(ReceiverType.Ceo) && getDiscountRequest(ReceiverType.Ceo).confirmed===null"
+                    (click)="editDiscount(ReceiverType.Ceo,false)" matTooltip="Отклонить запрошенную скидку">
+                    <mat-icon>block</mat-icon>
+                </button>
+            </div>
+            <div class="condiser-marginality">
+                <mat-checkbox [disabled]="!isDealNotConfirmed()||!isUserManager()||isExistHeadOrCeoDiscountRequest()"
+                    (change)="calculateSliderParams()" [(ngModel)]="deal.discountParams.considerMarginality">
+                    Учитывать М. при расчете максимальной скидки
+                </mat-checkbox>
+            </div>
+        </section>
+        <section [style.display]="!isDealNotConfirmed() ? 'none' : '' " class="sliders" *ngIf="isValidDiscountParams()">
+            <div class="discount">
+                <div class="title">Скидка: {{deal.discount}}%</div>
+                <div class="min">0%</div>
+                <mat-slider [disabled]="!isUserManager()" (change)="setMarginality()"
+                    [max]="floorOneDigit(maxDiscounts.maxDiscount)" [tickInterval]="0.5" [min]="0" [step]="0.5"
+                    [thumbLabel]="true" [(ngModel)]="deal.discount">
+                </mat-slider>
+
+                <div *ngIf="!discountLoading">{{ floorOneDigit(maxDiscounts.maxDiscount)}}%</div>
+                <mat-progress-spinner class="discount-spinner" *ngIf="discountLoading" color="accent"
+                    mode="indeterminate" [diameter]="22">
+                </mat-progress-spinner>
+
+            </div>
+            <div class="marginality">
+                <div class="title">М.: {{marginality}}%</div>
+                <div class="min-marg">
+                    <div class="min" *ngIf="!discountLoading">{{calculateDealMarginality(maxDiscounts.maxDiscount)}}%
+                    </div>
+                    <mat-progress-spinner class="marginality-spinner" *ngIf="discountLoading" color="accent"
+                        mode="indeterminate" [diameter]="22">
+                    </mat-progress-spinner>
+                </div>
+                <mat-slider disabled [max]="calculateDealMarginality(0)" [tickInterval]="0.1" [step]="0.1"
+                    [min]="calculateDealMarginality(maxDiscounts.maxDiscount)" [thumbLabel]="true"
+                    [(ngModel)]="marginality">
+                </mat-slider>
+                <div>{{calculateDealMarginality(0)}}%</div>
+            </div>
+        </section>
+
+        <mat-divider *ngIf="isValidDiscountParams()"></mat-divider>
+
+        <section class="sum" *ngIf="isValidDiscountParams()">
+            <div class="title">Итого</div>
+            <div class="discounts-sum">
+                <div>Сумма сделки со скидкой: {{calculateSumWithDiscount(deal.discount)}}</div>
+                <div>Скидка: {{deal.discount}}% ({{absDiscount | ceilTwoDigits}} {{deal.currency ? deal.currency :
+                    'у.е.'}})</div>
+            </div>
+            <div class="marginalities-sum">
+                <div [matTooltipShowDelay]="500" matTooltip="Маржинальность сделки">Md: {{marginality | ceilTwoDigits}}%
+                </div>
+                <div class="mmd" [matTooltipShowDelay]="500" matTooltip="Маржинальность менеджера по текущей сделке">
+                    Mmd:
+                    <div *ngIf="!discountLoading">&nbsp;{{managerDealMarginality | ceilTwoDigits}}%</div>
+                    <mat-progress-spinner class="discount-spinner" *ngIf="discountLoading" color="accent"
+                        mode="indeterminate" [diameter]="22">
+                    </mat-progress-spinner>
+                </div>
+                <div class="mcms" [style.display]="!isDealNotConfirmed() ? 'none' : '' " [matTooltipShowDelay]="500"
+                    matTooltip="Средняя маржинальность менеджера по всем сделкам сезона с учетом текущей без учета скидок руководителя и ген.директора">
+                    Mcms:
+                    <div *ngIf="!discountLoading">&nbsp;{{managerSeasonMarginality}}%</div>
+                    <mat-progress-spinner class="discount-spinner" *ngIf="discountLoading" color="accent"
+                        mode="indeterminate" [diameter]="22">
+                    </mat-progress-spinner>
+                </div>
+            </div>
+        </section>
+        <section [style.display]="!isDealNotConfirmed() ? 'none' : '' " class="marginalities"
+            *ngIf="isValidDiscountParams()">
+            <div class="title">Mgs</div>
+            <div class="stat">
+                <div [matTooltipShowDelay]="500" matTooltip="План по маржинальности на сезон">Mp:
+                    {{calcParams.marginalityPlan}}%</div>
+                <div [matTooltipShowDelay]="500" matTooltip="Средняя маржинальность менеджера по всем сделкам сезона">
+                    Mms:
+                    {{ceilOneDigit(calcParams.seasonMarginality)}}%</div>
+            </div>
+        </section>
+
+        <mat-divider *ngIf="deal.id"></mat-divider>
+
+        <mat-form-field class="delivery-type" *ngIf="deal.id">
+            <mat-select placeholder="Способ доставки" required [formControl]="deliveryTypeFormControl"
+                [errorStateMatcher]="matcher"
+                [disabled]="!isDealNotConfirmed()||!isUserManager()||isExistHeadOrCeoDiscountRequest()"
+                [(ngModel)]="deal.delivery">
+                <mat-option [value]="DeliveryType.SelfDelivery">Самовывоз (с нашего склада)</mat-option>
+                <mat-option [value]="DeliveryType.OurTransportServiceToClient">Наша транспортная служба до
+                    клиента</mat-option>
+                <mat-option [value]="DeliveryType.OurTransportServiceToCarrier">Наша транспортная служба до
+                    перевозчика</mat-option>
+                <mat-option [value]="DeliveryType.CarrierFromOurStock">Перевозчик (с нашего склада)</mat-option>
+                <mat-option [value]="DeliveryType.AsTransportServiceWants">На усмотрение траснпортной службы
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <section class="comment" *ngIf="deal.id&&!dealLoading">
+            <mat-form-field>
+                <textarea [disabled]="!isUserManager()||deal.status!==DealStatus.NotConfirmed" matInput
+                    cdkTextareaAutosize #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="2" cdkAutosizeMaxRows="5"
+                    placeholder="Комментарий" [(ngModel)]="deal.comment"></textarea>
+            </mat-form-field>
+        </section>
+    </main>
+    <mat-divider></mat-divider>
+    <footer>
+
+        <a class="download" [disabled]="!deal.id" href="{{getFileSrc(deal.orderFormId)}}" mat-icon-button
+            matTooltip="Скачать коммерческое предложение" [matTooltipShowDelay]="300" color="primary">
+            <mat-icon color="accent">file_download</mat-icon>
+        </a>
+
+        <button class="save" mat-icon-button color="accent" matTooltip="Сохранить сделку" [matTooltipShowDelay]="300"
+            [disabled]="!isValidDiscountParams()||!deal.delivery||deal.status!==DealStatus.NotConfirmed||!isUserManager()||!isExistMaxDiscount()"
+            (click)="saveDeal()">
+            <mat-icon>save</mat-icon>
+        </button>
+
+        <div style="flex:1"></div>
+
+        <button class="one-c" color="accent"
+            [disabled]="!isValidDiscountParams()||!deal.delivery||deal.status!==DealStatus.NotConfirmed||!isUserManager()||!isExistMaxDiscount()"
+            (click)="sendToPayment()" mat-raised-button>На оформление в 1С</button>
+
+        <div class="input-form">
+            <input id="inputFile" multiple [disabled]="deal.status!==DealStatus.OnPayment||!isUserManager()"
+                autocomplete="off" type="file" class="input-file" (change)="uploadContract($event.target.files)">
+            <label for="inputFile">Загрузить документы</label>
+        </div>
+
+    </footer>
+</div>

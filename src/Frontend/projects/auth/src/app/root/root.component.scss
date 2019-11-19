@@ -1,0 +1,63 @@
+@import '~@angular/material/_theming.scss';
+@import 'projects/auth/src/auth-colors.scss';
+$header-height:64px;
+:host {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+header {
+    position: relative;
+    width: 100%;
+    height: #{$header-height};
+    display: flex;
+    z-index: 900;
+    justify-content: space-between;
+    background-color: #fafafa;
+    @include mat-elevation(4);
+    section {
+        display: flex;
+        &.user,
+        &.empty {
+            flex: 1;
+        }
+    }
+    .user {
+        align-items: center;
+        justify-content: flex-end;
+        .username {
+            color: black;
+            margin-right: 10px;
+            font-weight: 300;
+        }
+        .profile-button {
+            width: 45px;
+            height: 45px;
+            justify-content: center;
+            margin-right: 10px;
+            transition: 200ms;
+            background: map-get($auth-accent, 50);
+            &:hover {
+                background: map-get($auth-accent, 100);
+            }
+        }
+    }
+    .logo {
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        text-decoration: none;
+        flex-shrink: 0;
+        img {
+            height: 48px;
+            outline: none;
+        }
+    }
+}
+
+main {
+    position: relative;
+    width: 100%;
+    flex: 1;
+}

@@ -1,0 +1,396 @@
+@import '~@angular/material/_theming.scss';
+@import 'projects/calc/src/calc-colors.scss';
+$footer-height:56px;
+$divider-height:1px;
+
+:host {
+    position: relative;
+    flex: 1;
+    height: 100%;
+}
+
+.layout {
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
+.loading {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.08);
+}
+
+main {
+    position: relative;
+    width: 100%;
+    height: calc(100% - #{$footer-height} - #{$divider-height});
+    overflow-y: auto;
+
+    .order-form-input {
+        flex: 1;
+        display: flex;
+        padding: 20px 20px 0;
+
+        .input-file {
+            width: 0.1px;
+            height: 0.1px;
+            opacity: 0;
+            overflow: hidden;
+            position: absolute;
+            z-index: -1;
+        }
+
+        .input-file+label {
+            background: map-get($calc-accent, 700);
+            border-radius: 6px;
+            height: 100px;
+            display: inline-block;
+            white-space: nowrap;
+            text-decoration: none;
+            vertical-align: baseline;
+            text-align: center;
+            margin: 0;
+            min-width: 88px;
+            width: 100%;
+            line-height: 100px;
+            padding: 0 16px;
+            font-size: 25px;
+            color: white;
+            box-shadow: 0 3px 1px -2px rgba(0, 0, 0, .2), 0 2px 2px 0 rgba(0, 0, 0, .14), 0 1px 5px 0 rgba(0, 0, 0, .12);
+            cursor: pointer;
+        }
+
+        .name {
+            align-self: center;
+
+            span {
+                font-weight: 500;
+            }
+        }
+    }
+
+    .deal-info {
+        flex: 1;
+        padding: 20px;
+
+        div:not(:first-child) {
+            margin-top: 10px;
+        }
+
+        .title {
+            font-weight: 500;
+        }
+    }
+
+    .discount-params {
+        flex: 1;
+        padding: 15px 20px 0 20px;
+
+        >.title {
+            font-weight: 500;
+            margin-top: 5px;
+        }
+
+        .order-contract-type {
+            display: flex;
+
+            .mat-form-field {
+                &.order-type {
+                    width: 360px;
+                }
+
+                &.contract-type {
+                    width: 150px;
+                }
+
+                margin: 5px 20px 0 0;
+            }
+        }
+
+        .installment-prepayment {
+            display: flex;
+
+            .mat-form-field {
+                &.installment {
+                    width: 175px;
+                }
+
+                &.prepayment {
+                    width: 160px;
+                }
+
+                margin: 0 20px 0 0;
+            }
+
+            .prepayment-error {
+                color: map-get($mat-amber, 700);
+            }
+        }
+    }
+
+    .discounts {
+        flex: 1;
+        padding: 0 20px 0;
+
+        .head-discount,
+        .ceo-discount {
+            display: flex;
+
+            .title {
+                width: 190px;
+                align-self: center;
+            }
+
+            .mat-form-field {
+                width: 100px;
+                margin-left: 20px;
+            }
+
+            .mat-icon.status {
+                align-self: center;
+                margin: 10px;
+
+                &.confirmed {
+                    color: green;
+                }
+
+                &.rejected {
+                    color: darkred;
+                }
+
+                &.in-process {
+                    color: map-get($calc-accent, 700);
+                }
+            }
+
+            .action-button {
+                margin: 10px;
+                align-self: center;
+                transition: 200ms;
+
+                &.add-discount {
+                    background: map-get($calc-accent, 50);
+
+                    &:hover:not(:disabled) {
+                        background: map-get($calc-accent, 100);
+                    }
+                }
+
+                &.confirm-discount {
+                    color: green;
+                    background: map-get($mat-green, 50);
+
+                    &:hover:not(:disabled) {
+                        background: map-get($mat-green, 100);
+                    }
+                }
+
+                &.reject-discount {
+                    color: darkred;
+                    background: map-get($calc-warn, 50);
+
+                    &:hover:not(:disabled) {
+                        background: map-get($calc-warn, 100);
+                    }
+                }
+            }
+        }
+
+        .condiser-marginality {
+            margin: 10px 0;
+        }
+    }
+
+    .sliders {
+        flex: 1;
+        padding: 0 20px 5px;
+
+        .discount,
+        .marginality {
+            display: flex;
+
+            .title {
+                font-weight: 500;
+                width: 110px;
+            }
+
+            div {
+                align-self: center;
+            }
+
+            .mat-slider {
+                width: 300px;
+            }
+
+            .min-marg,
+            .min {
+                width: 50px;
+                display: flex;
+                justify-content: flex-end;
+
+                .marginality-spinner {
+                    align-self: center;
+                    margin-right: 5px;
+                }
+            }
+
+            .discount-spinner {
+                align-self: center;
+                margin: 0 5px;
+            }
+
+        }
+    }
+
+    .sum {
+        flex: 1;
+        padding: 20px 20px 0;
+
+        .title {
+            font-weight: 500;
+        }
+
+        .discounts-sum {
+            display: flex;
+            flex: 1;
+            margin-top: 10px;
+
+            div {
+                margin-right: 20px;
+            }
+        }
+
+        .marginalities-sum {
+            display: flex;
+            flex: 1;
+            margin-top: 10px;
+            height: 25px;
+
+            .mmd,
+            .mcms {
+                display: flex;
+
+                .discount-spinner {
+                    align-self: center;
+                    margin-left: 10px;
+                }
+            }
+
+            >div {
+                width: 120px;
+            }
+        }
+    }
+
+    .marginalities {
+        flex: 1;
+        padding: 10px 20px 20px;
+
+        .title {
+            font-weight: 500;
+        }
+
+        .stat {
+            display: flex;
+
+            div {
+                margin-right: 20px;
+                margin-top: 10px;
+            }
+        }
+    }
+
+    .delivery-type {
+        padding: 5px 0 0 20px;
+        position: relative;
+        width: 400px;
+    }
+
+    .comment {
+        flex: 1;
+        padding: 0 20px 0;
+        margin-top: -10px;
+
+        .mat-form-field {
+            width: 400px;
+        }
+    }
+}
+
+footer {
+    position: relative;
+    width: 100%;
+    height: #{$footer-height};
+    display: flex;
+
+    .save,
+    .download {
+        align-self: center;
+        margin-left: 10px;
+        transition: 200ms;
+        background: map-get($calc-accent, 50);
+
+        &:hover {
+            background: map-get($calc-accent, 100);
+        }
+    }
+
+    .one-c {
+        height: 35px;
+        line-height: normal;
+        align-self: center;
+        margin-right: 10px;
+        font-weight: 400;
+    }
+
+    .input-form {
+        align-self: center;
+        margin-right: 10px;
+
+        .input-file {
+            width: 0.1px;
+            height: 0.1px;
+            opacity: 0;
+            overflow: hidden;
+            position: absolute;
+            z-index: -1;
+        }
+
+        .input-file {
+            &+label {
+                background-color: map-get($calc-accent, 700);
+                border-radius: 4px;
+                height: 35px;
+                display: inline-block;
+                white-space: nowrap;
+                text-decoration: none;
+                vertical-align: baseline;
+                text-align: center;
+                margin: 0;
+                min-width: 88px;
+                width: 142px;
+                line-height: 35px;
+                padding: 0 16px;
+                color: white;
+                font-size: 14px;
+                font-weight: 400;
+                box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+                cursor: pointer;
+            }
+
+            &:disabled {
+                &+label {
+                    background-color: rgba(0, 0, 0, 0.12);
+                    box-shadow: none;
+                    color: rgba(0, 0, 0, 0.26);
+                }
+            }
+        }
+    }
+}

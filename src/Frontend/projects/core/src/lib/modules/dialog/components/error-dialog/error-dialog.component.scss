@@ -1,0 +1,30 @@
+.error-dialog-layout {
+    width: 400px;
+    padding: 20px;
+    header {
+        display: flex;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        div {
+            font-size: 18px;
+            padding: 2px 10px;
+        }
+    }
+    main {
+        word-break: break-word;
+        div {
+            margin: 5px 0;
+        }
+        pre {
+            max-height: 320px;
+            overflow: auto;
+        }
+    }
+    footer {
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+        button {
+            float: right;
+            margin: 10px 0;
+        }
+    }
+}

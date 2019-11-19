@@ -1,0 +1,16 @@
+<div class="dialog-layout">
+    <header>
+        <mat-icon>done</mat-icon>
+        <div> Файл успешно загружен.</div>
+    </header>
+    <main>
+        <div>Для просмотра состояния выгрузки перейдите на
+            <a (click)="redirectToHistory()">
+                <span>страницу истории</span>
+            </a>
+        </div>
+    </main>
+    <footer>
+        <button mat-button (click)="closeDialog()">Закрыть</button>
+    </footer>
+</div>

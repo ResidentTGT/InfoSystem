@@ -1,0 +1,18 @@
+<div class="error-dialog-layout">
+    <header>
+        <mat-icon color="warn">error</mat-icon>
+        <div> Возникла ошибка!</div>
+    </header>
+    <main>
+        <div>
+            {{errorMessage}}
+        </div>
+        <div *ngIf="info">
+            {{info}}
+        </div>
+    </main>
+    <mat-divider></mat-divider>
+    <footer>
+        <button mat-button (click)="closeDialog()">Закрыть</button>
+    </footer>
+</div>

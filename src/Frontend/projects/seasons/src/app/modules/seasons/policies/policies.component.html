@@ -1,0 +1,313 @@
+<div class="layout">
+    <mat-card class="main-card">
+        <div class="loading" *ngIf="loading">
+            <mat-progress-spinner color="accent" mode="indeterminate" [strokeWidth]="6"></mat-progress-spinner>
+        </div>
+        <header>
+            <mat-form-field>
+                <mat-select (selectionChange)="loadPolicy()" [(ngModel)]="season" placeholder="Сезон">
+                    <mat-option *ngFor="let season of seasonsList.listValues" [value]="season">{{season.value}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <button class="save" *ngIf="policy && policy.policyData" (click)="savePolicy()" mat-flat-button
+                color="accent">Сохранить политику</button>
+        </header>
+        <mat-divider></mat-divider>
+        <main *ngIf="policy && policy.policyData">
+
+            <mat-tab-group>
+
+                <mat-tab label="Партнёр">
+
+                    <section class="partners-importance">
+                        <div class="title">Важность партнера</div>
+                        <div class="item">
+                            <mat-form-field class="internet-key">
+                                <input autocomplete="off" placeholder="Интернет-ключевой" matInput type="number"
+                                    [(ngModel)]="policy.policyData.internetKeyPartnerImportanceDiscount">
+                                <div matSuffix>%</div>
+                            </mat-form-field>
+                        </div>
+                        <div class="item">
+                            <mat-form-field>
+                                <input autocomplete="off" matInput placeholder="Сети" type="number"
+                                    [(ngModel)]="policy.policyData.networkPartnerImportanceDiscount">
+                                <div matSuffix>%</div>
+                            </mat-form-field>
+                        </div>
+                        <div class="item">
+                            <mat-form-field class="key">
+                                <input autocomplete="off" matInput type="number" placeholder="Ключевой партнер"
+                                    [(ngModel)]="policy.policyData.keyPartnerImportanceDiscount">
+                                <div matSuffix>%</div>
+                            </mat-form-field>
+                        </div>
+                        <div class="item">
+                            <mat-form-field class="internet">
+                                <input autocomplete="off" matInput type="number" placeholder="Интернет"
+                                    [(ngModel)]="policy.policyData.internetPartnerImportanceDiscount">
+                                <div matSuffix>%</div>
+                            </mat-form-field>
+                        </div>
+                        <div class="item">
+                            <mat-form-field>
+                                <input autocomplete="off" matInput type="number" placeholder="Опт"
+                                    [(ngModel)]="policy.policyData.wholesalePartnerImportanceDiscount">
+                                <div matSuffix>%</div>
+                            </mat-form-field>
+                        </div>
+                    </section>
+
+                    <section class="partners-type">
+
+                        <div class="title">Тип партнера</div>
+
+                        <div class="item">
+                            <mat-form-field class="new">
+                                <input autocomplete="off" placeholder="Новый" matInput type="number"
+                                    [(ngModel)]="policy.policyData.newPartnerDiscount">
+                                <div matSuffix>%</div>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="item">
+                            <mat-form-field class="repeat">
+                                <input autocomplete="off" placeholder="Повторный" matInput type="number"
+                                    [(ngModel)]="policy.policyData.repeatedPartnerDiscount">
+                                <div matSuffix>%</div>
+                            </mat-form-field>
+                        </div>
+
+                    </section>
+
+                    <section class="contract-type">
+                        <div class="title">Тип договора</div>
+                        <div class="item">
+                            <mat-form-field class="sale">
+                                <input autocomplete="off" placeholder="Купля-продажа" matInput type="number"
+                                    [(ngModel)]="policy.policyData.purchaseAndSaleDiscount">
+                                <div matSuffix>%</div>
+                            </mat-form-field>
+                        </div>
+                        <div class="item">
+                            <mat-form-field class="comission">
+                                <input autocomplete="off" placeholder="Комиссия" matInput type="number"
+                                    [(ngModel)]="policy.policyData.commission">
+                                <div matSuffix>%</div>
+                            </mat-form-field>
+                        </div>
+                    </section>
+
+                    <section class="columns">
+                        <div class="column ">
+                            <div class="header brandmix">
+                                <div>Бренд-микс</div>
+                                <div class="discount">Скидка, %</div>
+                            </div>
+                            <div class="field" *ngFor="let brandMix of policy.policyData.brandMixDiscount">
+                                <mat-form-field>
+                                    <input autocomplete="off" type="number" matInput [(ngModel)]="brandMix.value">
+                                </mat-form-field>
+                                <mat-form-field class="discount">
+                                    <input autocomplete="off" matInput type="number" [(ngModel)]="brandMix.discount">
+                                </mat-form-field>
+                                <button color="warn" class="delete" mat-icon-button (click)="deleteBrandMix(brandMix)">
+                                    <mat-icon>clear</mat-icon>
+                                </button>
+                            </div>
+                            <button class="add" mat-icon-button (click)="addBrandMix()">
+                                <mat-icon>add</mat-icon>
+                            </button>
+                        </div>
+                    </section>
+
+                    <section class="group-importance">
+                        <div class="marginality">План маржинальности по типу канала:</div>
+                        <div class="item">
+                            <mat-form-field>
+                                <input autocomplete="off" matInput type="number" placeholder="Опт"
+                                    [(ngModel)]="policy.salesPlanData.wholesaleMarginality">
+                                <div matSuffix>%</div>
+                            </mat-form-field>
+                        </div>
+                        <div class="item">
+                            <mat-form-field>
+                                <input autocomplete="off" matInput type="number" placeholder="Сети"
+                                    [(ngModel)]="policy.salesPlanData.networkMarginality">
+                                <div matSuffix>%</div>
+                            </mat-form-field>
+                        </div>
+                    </section>
+
+                </mat-tab>
+
+                <mat-tab label="Заказ">
+
+                    <section class="order-type">
+
+                        <div class="title">Тип заказа</div>
+
+                        <div class="item">
+                            <mat-form-field class="preorder">
+                                <input autocomplete="off" placeholder="Предзаказ" matInput type="number"
+                                    [(ngModel)]="policy.policyData.preOrderDiscount">
+                                <div matSuffix>%</div>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="item">
+                            <mat-form-field class="current-freewarehouse">
+                                <input autocomplete="off" placeholder="Свободный склад (текущий)" matInput type="number"
+                                    [(ngModel)]="policy.policyData.freeWarehouseCurrentOrderDiscount">
+                                <div matSuffix>%</div>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="item">
+                            <mat-form-field class="past-freewarehouse">
+                                <input autocomplete="off" matInput type="number"
+                                    placeholder="Свободный склад (прошлых сезонов)"
+                                    [(ngModel)]="policy.policyData.freeWarehousePastOrderDiscount">
+                                <div matSuffix>%</div>
+                            </mat-form-field>
+                        </div>
+
+                    </section>
+
+                    <section class="columns">
+                        <div class="column">
+                            <div class="header volume">
+                                <div>Объем, тыс. р.</div>
+                                <div class="discount">Скидка, %</div>
+                            </div>
+                            <div class="field" *ngFor="let volume of policy.policyData.volumeDiscount">
+                                <mat-form-field class="volume">
+                                    <input autocomplete="off" matInput type="number" [(ngModel)]="volume.value">
+                                </mat-form-field>
+                                <mat-form-field class="discount">
+                                    <input autocomplete="off" matInput type="number" [(ngModel)]="volume.discount">
+                                </mat-form-field>
+                                <button color="warn" class="delete" mat-icon-button (click)="deleteVolume(volume)">
+                                    <mat-icon>clear</mat-icon>
+                                </button>
+                            </div>
+                            <button class="add" mat-icon-button (click)="addVolume()">
+                                <mat-icon>add</mat-icon>
+                            </button>
+                        </div>
+                    </section>
+
+                </mat-tab>
+
+                <mat-tab label="Бренды">
+
+                    <section class="brands">
+
+                        <div class="brand">
+                            <div class="title">По брендам</div>
+                            <div class="volume">Мин. объем</div>
+                            <div class="prepayment">Мин. объем предоплаты</div>
+                            <div class="cutoff">Отсекающая скидка</div>
+                        </div>
+
+                        <div class="brand" *ngFor="let brand of sortBrandcompanyyAlphabet(policy.brandPolicyDatas)">
+                            <div class="name">{{brand.brandName}}</div>
+                            <mat-form-field class="volume">
+                                <input autocomplete="off" matInput type="number" [(ngModel)]="brand.volume">
+                                <div matSuffix>тыс. у.е.</div>
+                            </mat-form-field>
+                            <mat-form-field class="prepayment">
+                                <input autocomplete="off" matInput type="number"
+                                    [(ngModel)]="brand.prepaymentVolumePercent">
+                                <div matSuffix>%</div>
+                            </mat-form-field>
+                            <mat-form-field class="cutoff">
+                                <input autocomplete="off" matInput type="number"
+                                    [(ngModel)]="brand.cutoffDiscountPercent">
+                                <div matSuffix>%</div>
+                            </mat-form-field>
+                        </div>
+
+                    </section>
+
+                    <section class="markup">
+                        <div class="markup-title">Несоблюдение объема:</div>
+                        <mat-form-field>
+                            <input autocomplete="off" matInput type="number"
+                                [(ngModel)]="policy.policyData.markupForMismatchOfVolume">
+                            <div matSuffix>%</div>
+                        </mat-form-field>
+                    </section>
+                </mat-tab>
+
+                <mat-tab label="Предоплата">
+
+                    <section class="planned-params">
+                        <mat-form-field>
+                            <input autocomplete="off" placeholder="Заложенная рассрочка" matInput type="number"
+                                [(ngModel)]="policy.policyData.plannedInstallment">
+                            <div matSuffix>мес.</div>
+                        </mat-form-field>
+                        <mat-form-field>
+                            <input autocomplete="off" placeholder="Заложенная предоплата" matInput type="number"
+                                [(ngModel)]="policy.policyData.plannedPrepayment">
+                            <div matSuffix>%</div>
+                        </mat-form-field>
+                        <mat-form-field>
+                            <input autocomplete="off" placeholder="Годовая ставка" matInput type="number"
+                                [(ngModel)]="policy.policyData.annualRate">
+                            <div matSuffix>%</div>
+                        </mat-form-field>
+                        <mat-form-field style="display: none">
+                            <input autocomplete="off" placeholder="Максимальное кол-во периодов рассрочки" matInput
+                                type="number" [(ngModel)]="policy.policyData.maxCountOfInstallmentPeriods">
+                        </mat-form-field>
+                    </section>
+
+                    <section class="columns">
+                        <div class="column ">
+                            <div class="header prepayment">
+                                <div>Предоплата, %</div>
+                                <div class="discount">Скидка, %</div>
+                            </div>
+                            <div class="field" *ngFor="let prepayment of policy.policyData.prepaymentDiscount">
+                                <mat-form-field class="prepayment">
+                                    <input autocomplete="off" matInput type="number" [(ngModel)]="prepayment.value">
+                                </mat-form-field>
+                                <mat-form-field class="discount">
+                                    <input autocomplete="off" matInput type="number" [(ngModel)]="prepayment.discount">
+                                </mat-form-field>
+                                <button color="warn" class="delete" mat-icon-button
+                                    (click)="deletePrepayment(prepayment)">
+                                    <mat-icon>clear</mat-icon>
+                                </button>
+                            </div>
+                            <button class="add" mat-icon-button (click)="addPrepayment()">
+                                <mat-icon>add</mat-icon>
+                            </button>
+                        </div>
+                    </section>
+                </mat-tab>
+
+                <mat-tab label="Курсы валют">
+                    <section class="exchange-rates">
+
+                        <mat-form-field class="rate">
+                            <input min="0" autocomplete="off" matInput type="number"
+                                [(ngModel)]="policy.exchangeRates.eurRub" placeholder="EUR/RUB">
+                        </mat-form-field>
+                        <mat-form-field class="rate">
+                            <input min="0" autocomplete="off" matInput type="number"
+                                [(ngModel)]="policy.exchangeRates.eurUsd" placeholder="EUR/USD">
+                        </mat-form-field>
+                    </section>
+                </mat-tab>
+
+            </mat-tab-group>
+
+        </main>
+
+    </mat-card>
+</div>

@@ -1,0 +1,54 @@
+<div class="retail-edit-attributes-dialog-layout">
+    <div class="loading" *ngIf="loading">
+        <mat-progress-spinner color="accent" mode="indeterminate" [strokeWidth]="8"></mat-progress-spinner>
+    </div>
+
+    <div class="dialog-content">
+        <header>
+            <mat-icon color="accent">edit</mat-icon>
+            <div> Редактирование атрибута для товаров ({{products.length}})</div>
+        </header>
+
+        <mat-divider></mat-divider>
+
+        <main>
+
+            <mat-form-field class="attr-select">
+                <mat-select matInput placeholder="Атрибут" [(ngModel)]="selectedAttribute"
+                            [ngModelOptions]="{standalone: true}" (selectionChange)="changeSelectedAttribute()">
+                    <mat-option [value]="null">-</mat-option>
+                    <mat-option *ngFor="let attr of attributes" [value]="attr">{{attr.name}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <div class="attr-value" *ngIf="selectedAttribute">
+                <mat-form-field class="number">
+                    <input matInput placeholder="Значение" type="number" autocomplete="off"
+                           [attr.min]="selectedAttribute.min ? selectedAttribute.min : null"
+                           (change)="changeAttributeValue($event)">
+                    <mat-hint align="end">
+                        {{selectedAttribute.min ? 'от: ' + selectedAttribute.min : ''}}
+                        {{selectedAttribute.max ? 'до: ' + selectedAttribute.max : ''}}
+                    </mat-hint>
+                </mat-form-field>
+                <div class="after-attr-value">
+                    <mat-form-field class="pin-attr" *ngIf="pinList.length">
+                        <mat-select matInput placeholder="Закрепить" [(ngModel)]="selectedPin">
+                            <mat-option [value]="null">-</mat-option>
+                            <mat-option *ngFor="let listVal of pinList" [value]="listVal">
+                                {{listVal.name}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+
+        </main>
+
+        <mat-divider></mat-divider>
+
+        <footer>
+            <button mat-flat-button color="primary" (click)="updateAttributes()" [disabled]="!selectedAttribute || !selectedPin">Сохранить</button>
+            <button mat-flat-button color="warn" (click)="closeDialog()">Отмена</button>
+        </footer>
+    </div>
+</div>

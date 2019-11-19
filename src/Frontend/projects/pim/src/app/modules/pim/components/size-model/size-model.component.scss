@@ -1,0 +1,82 @@
+@import '~@angular/material/_theming.scss';
+@import 'projects/pim/src/pim-colors.scss';
+:host {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+header {
+    position: relative;
+    display: flex;
+    width: 100%;
+    height: 65px;
+    .mat-form-field,
+    .sku {
+        margin-left: 20px;
+        align-self: center;
+        width: 200px;
+    }
+}
+
+main {
+    position: relative;
+    width: 100%;
+    height: calc(100% - 65px);
+    .attributes {
+        position: relative;
+        width: calc(100% - 40px);
+        height: 100%;
+        margin: 0 20px;
+        .group {
+            position: relative;
+            width: 100%;
+            .group-name {
+                display: flex;
+                strong {
+                    align-self: center;
+                    margin-left: 10px;
+                }
+            }
+            .attribute {
+                display: flex;
+                margin-left: 35px;
+                .name {
+                    align-self: center;
+                    width: 300px;
+                    padding-right: 20px;
+                }
+                .value {
+                    flex: 1;
+                    width: calc(100% - 300px);
+                    .mat-form-field {
+                        width: calc(100% - 20px);
+                        .mat-hint {
+                            font-size: 12px;
+                            font-weight: 400;
+                            color: map-get($pim-warn, 300);
+                            span {
+                                padding-left: 10px;
+                                &.hint-current {
+                                    color: map-get($pim-primary, 500);
+                                }
+                            }
+                        }
+                    }
+                    .checkbox {
+                        margin: 10px 0;
+                    }
+                    .required-star {
+                        display: inline;
+                        margin-left: 10px;
+                        font-size: 16px;
+                        color: map-get($pim-warn, 800);
+                        &.required-filled {
+                            color: map-get($pim-primary, 500);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

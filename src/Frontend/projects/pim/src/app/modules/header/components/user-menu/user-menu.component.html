@@ -1,0 +1,7 @@
+<ng-container *ngIf="userService.user !== null">
+    <span class="username">{{ userService.user.displayName !== null ? userService.user.displayName :
+        userService.user.userName }}</span>
+    <button color="accent" class="profile-button" mat-icon-button (click)="logout()">
+        <mat-icon>exit_to_app</mat-icon>
+    </button>
+</ng-container>

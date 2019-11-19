@@ -1,0 +1,33 @@
+.dialog-layout {
+    width: 440px;
+    padding: 20px;
+    header {
+        display: flex;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        .mat-icon {
+            color: #fbc02d;
+            align-self: center;
+        }
+        div {
+            font-size: 18px;
+            padding: 2px 10px;
+        }
+    }
+    main {
+        padding: 10px 0 0 0;
+        word-break: break-word;
+        div {
+            max-height: 320px;
+            overflow: auto;
+        }
+    }
+    footer {
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+        button {
+            float: right;
+            margin: 10px 0 10px 15px;
+            transition: 200ms;
+        }
+    }
+}

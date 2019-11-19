@@ -1,0 +1,117 @@
+<div class="layout">
+    <div class="loading" *ngIf="productLoading">
+        <mat-progress-spinner color="accent" mode="indeterminate" [strokeWidth]="8"></mat-progress-spinner>
+    </div>
+
+    <div class="error" *ngIf="error">
+        <div>{{error}}</div>
+    </div>
+
+    <button class="save-button" *ngIf="product&&!!attributesLists.length" mat-raised-button color="accent" [disabled]="!lc||!lcp"
+        (click)="saveProduct()">
+        Сохранить
+    </button>
+
+    <header *ngIf="product">
+        <div class="main-info">
+            <div class="image-container" (click)="openImage(backendApiService.FileStorage.getFileSrc(product.mainImgId))">
+                <img [src]="product.mainImgId ? backendApiService.FileStorage.getFileSrc(product.mainImgId) : 'assets/no-photo.png'" alt="Product photo" />
+            </div>
+            <div class="info" *ngIf="!!categories.length">
+                <div>Наименование: {{product.name}}</div>
+                <div>SKU: {{product.sku}}</div>
+                <div>Категория: {{getCategoryName(product.categoryId)}}</div>
+            </div>
+        </div>
+        <div class="form">
+            <div class="table">
+                <div class="row" *ngIf="product&&!!attributesLists.length">
+                    <mat-form-field class="tnved" *ngIf="tnvedList">
+                        <mat-select (selectionChange)="calculateLc()" [(ngModel)]="tnved" placeholder="Код ТНВЭД">
+                            <mat-option [value]="null">-</mat-option>
+                            <mat-option *ngFor="let tnved of tnvedList.listValues" [value]="tnved">{{tnved.value}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <div class="column" *ngIf="getFob()">
+                        <div>FOB</div>
+                        <div>{{(getFob()|ceilTwoDigits)}} {{getCurrency()}}</div>
+                    </div>
+                    <div class="column" *ngIf="logistics">
+                        <div>Логистика</div>
+                        <div>{{(getLogistics()|ceilTwoDigits)}} {{getCurrency()}}</div>
+                    </div>
+                    <div class="column" *ngIf="logistics">
+                        <div>Прочее</div>
+                        <div>{{(getOther()|ceilTwoDigits)}} {{getCurrency()}}</div>
+                    </div>
+                    <mat-form-field>
+                        <input (input)="calculateLc()" type="number" autocomplete="off" matInput [(ngModel)]="tax"
+                            placeholder="Пошлина">
+                        <div matSuffix>{{getCurrency()}}</div>
+                    </mat-form-field>
+                    <mat-form-field *ngIf="vatList">
+                        <mat-select (selectionChange)="calculateLc()" [(ngModel)]="vat" placeholder="НДС">
+                            <mat-option *ngFor="let vat of vatList.listValues" [value]="vat">{{vat.value}}</mat-option>
+                        </mat-select>
+                        <div matSuffix>%</div>
+                    </mat-form-field>
+                </div>
+
+                <div class="row" *ngIf="product&&!!attributesLists.length">
+                    <div class="column" *ngIf="lcp">
+                        <div>Landing Cost</div>
+                        <div>{{(lcp|ceilTwoDigits)}} {{getCurrency()}}</div>
+                    </div>
+                    <div class="column" *ngIf="lc">
+                        <div>Landing Cost с НДС</div>
+                        <div>{{(lc|ceilTwoDigits)}} {{getCurrency()}}</div>
+                    </div>
+                    <div class="column">
+                        <mat-checkbox color="accent" [(ngModel)]="isRecalculateChecked">
+                            Посчитать БОЦ/РРЦ
+                        </mat-checkbox>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <mat-divider></mat-divider>
+    <main>
+        <div *ngIf="product" class="attributes">
+            <div class="item" *ngFor="let property of product.properties">
+                <div class="value" *ngIf="!!attributesLists.length&&getAttributeValue(property)">{{property.attribute.name}}:
+                </div>
+                <div class="value" *ngIf="!!attributesLists.length && getAttributeValue(property)">
+                    {{getAttributeValue(property)}}</div>
+            </div>
+        </div>
+        <mat-divider></mat-divider>
+
+        <div class="gallery">
+            <div *ngFor="let media of mediaContent" class="media-container">
+                <div class="media" *ngIf="media.type===FileType.Image">
+                    <div class="media-content" (click)="openImage(media.src)">
+                        <img [src]="media.src | sanitizeUrl" alt="Media content" />
+                    </div>
+                    <div class="name">{{media.name}}</div>
+                    <div class="additional-buttons">
+                        <a href="{{media.src}}" mat-icon-button color="primary">
+                            <mat-icon>file_download</mat-icon>
+                        </a>
+                    </div>
+                </div>
+                <div class="media" *ngIf="media.type===FileType.Video">
+                    <div class="media-content" (click)="openImage(media.src)">
+                        <video controls [src]="media.src | sanitizeUrl"></video>
+                    </div>
+                    <div class="name">{{media.name}}</div>
+                    <div class="additional-buttons">
+                        <a href="{{media.src}}" mat-icon-button color="primary">
+                            <mat-icon>file_download</mat-icon>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>

@@ -1,0 +1,14 @@
+<div class="dialog-layout">
+    <header>
+        <mat-icon>warning</mat-icon>
+        <div> {{message}}</div>
+    </header>
+    <main>
+        <div>{{info}}</div>
+    </main>
+    <mat-divider></mat-divider>
+    <footer>
+        <button mat-flat-button color="warn" (click)="cancel()">Отмена</button>
+        <button mat-flat-button color="primary" (click)="confirm()">Да</button>
+    </footer>
+</div>

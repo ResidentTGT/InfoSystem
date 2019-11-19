@@ -1,0 +1,259 @@
+@import '~@angular/material/_theming.scss';
+@import 'projects/calc/src/calc-colors.scss';
+:host {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+}
+
+.layout {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    .save-button {
+        position: absolute;
+        z-index: 900;
+        right: 15px;
+        top: 15px;
+    }
+    header {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        height: 580px;
+        width: 100%;
+        .main-info {
+            position: relative;
+            width: 100%;
+            display: flex;
+            height: 200px;
+            .image-container {
+                width: 200px;
+                height: 160px;
+                padding: 20px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                position: relative;
+                cursor: pointer;
+                img {
+                    max-height: 100%;
+                    max-width: 100%;
+                    border-radius: 3px;
+                }
+            }
+            .info {
+                position: relative;
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                align-self: center;
+                div {
+                    margin-top: 15px;
+                }
+            }
+        }
+        .form {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            .table {
+                position: relative;
+                width: 100%;
+                height: 340px;
+                display: flex;
+                .sum {
+                    display: flex;
+                    margin-left: 20px;
+                    position: relative;
+                    .column1 {
+                        position: relative;
+                        width: 150px;
+                        div {
+                            height: 65px;
+                            display: flex;
+                            align-items: center;
+                            &.first,
+                            &.second {
+                                height: 40px;
+                            }
+                        }
+                    }
+                    .column2 {
+                        position: relative;
+                        width: 290px;
+                        .row {
+                            position: relative;
+                            width: 100%;
+                            display: flex;
+                            justify-content: space-between;
+                            height: 65px;
+                            &.first {
+                                height: 40px;
+                            }
+                            &.lc {
+                                align-self: center;
+                                align-items: center;
+                                justify-content: center;
+                                display: flex;
+                                height: 40px;
+                            }
+                            .name {
+                                width: 120px;
+                                display: flex;
+                                align-items: center;
+                                flex-direction: column;
+                                align-self: center;
+                            }
+                            .mat-form-field {
+                                width: 150px;
+                                margin-right: 15px;
+                                text-align: center;
+                            }
+                        }
+                    }
+                    .column3 {
+                        position: relative;
+                        width: 100px;
+                        div {
+                            height: 65px;
+                            display: flex;
+                            align-items: center;
+                            flex-direction: column;
+                            align-self: center;
+                            &.first,
+                            &.second {
+                                text-align: center;
+                                line-height: 40px;
+                                height: 40px;
+                            }
+                        }
+                        .mat-radio-group {
+                            display: flex;
+                            flex-direction: column;
+                            .mat-radio-button {
+                                height: 66px;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                width: 90px;
+                                &:first-of-type {
+                                    height: 131px;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .profitability {
+            margin: 15px 0 15px 20px;
+        }
+    }
+    main {
+        position: relative;
+        flex: 1;
+        height: calc(100% - 560px - 6px);
+        .gallery {
+            position: relative;
+            width: 100%;
+            display: flex;
+            overflow-x: auto;
+            height: 220px;
+            .media-container {
+                position: relative;
+                min-width: 250px;
+                display: flex;
+                width: 180px;
+                height: calc(100% - 20px);
+                margin: 10px 0 10px 20px;
+                .media {
+                    position: relative;
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    flex-direction: column;
+                    .media-content {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        position: relative;
+                        width: 100%;
+                        height: calc(100% - 60px);
+                        cursor: pointer;
+                        img {
+                            max-height: 100%;
+                            max-width: 100%;
+                            border-radius: 5px;
+                        }
+                        video {
+                            width: 100%;
+                            height: 100%;
+                            border-radius: 5px;
+                            position: relative;
+                        }
+                    }
+                    .name {
+                        height: 20px;
+                        text-overflow: ellipsis;
+                        overflow: hidden;
+                        max-width: 100%;
+                    }
+                    .additional-buttons {
+                        height: 40px;
+                        transition: 300ms;
+                        button,
+                        a {
+                            margin: 0 5px;
+                            transition: 200ms;
+                            &:hover:not(:disabled) {
+                                background: rgba(0, 0, 0, 0.1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .attributes {
+            position: relative;
+            width: 100%;
+            min-height: calc(100% - 231px - 1px);
+            display: flex;
+            flex-direction: column;
+            .item {
+                display: flex;
+                position: relative;
+                margin-left: 20px;
+                .value {
+                    margin: 15px 10px 0 0;
+                }
+            }
+        }
+    }
+}
+
+.loading,
+.error {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.06);
+}
+
+.error {
+    color: red;
+    div {
+        font-size: 18px;
+        width: 400px;
+        text-align: center;
+    }
+}

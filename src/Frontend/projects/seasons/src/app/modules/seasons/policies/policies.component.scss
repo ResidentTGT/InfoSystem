@@ -1,0 +1,276 @@
+@import '~@angular/material/_theming.scss';
+@import 'projects/seasons/src/seasons-colors.scss';
+
+:host {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.layout {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+
+    .main-card {
+        width: 900px;
+        position: relative;
+        height: calc(100% - 40px);
+        align-self: center;
+        padding: 0;
+    }
+}
+
+.loading {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.06);
+}
+
+header {
+    position: relative;
+    width: 100%;
+    height: 65px;
+    display: flex;
+    justify-content: space-between;
+
+    .mat-form-field {
+        margin-left: 20px;
+        width: 200px;
+        padding-top: 5px;
+    }
+
+    button {
+        margin-right: 20px;
+        align-self: center;
+        font-weight: 400;
+    }
+}
+
+.mat-divider {
+    z-index: 800;
+}
+
+main {
+    position: relative;
+    width: 100%;
+    height: calc(100% - 110px);
+    overflow-y: auto;
+
+    .partners-importance,
+    .partners-type,
+    .contract-type,
+    .order-type,
+    .group-importance,
+    .prepayment-params,
+    .markup,
+    .exchange-rates {
+        display: flex;
+        padding: 0 20px;
+        flex-wrap: wrap;
+
+        .title {
+            font-weight: 500;
+            align-self: center;
+            width: 150px;
+        }
+
+        .markup-title {
+            width: 200px;
+            font-weight: 500;
+            align-self: center;
+        }
+
+        .marginality {
+            font-weight: 500;
+            align-self: center;
+            width: 380px;
+        }
+
+        .item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-left: 15px;
+
+            .mat-form-field {
+                width: 65px;
+
+                &.internet-key {
+                    width: 180px;
+                }
+
+                &.key {
+                    width: 170px;
+                }
+
+                &.internet {
+                    width: 95px;
+                }
+
+                &.new {
+                    width: 75px;
+                }
+
+                &.repeat {
+                    width: 115px;
+                }
+
+                &.sale,
+                &.comission {
+                    width: 145px;
+                }
+
+                &.preorder {
+                    width: 100px;
+                }
+
+                &.current-freewarehouse {
+                    width: 235px;
+                }
+
+                &.past-freewarehouse {
+                    width: 310px;
+                }
+            }
+        }
+    }
+
+    .partners-importance,
+    .order-type,
+    .planned-params,
+    .exchange-rates {
+        margin-top: 10px;
+    }
+
+    .exchange-rates {
+        .rate {
+            width: 150px;
+            margin-right: 15px;
+        }
+    }
+
+    .brands {
+        width: calc(100% - 40px);
+        display: flex;
+        flex-direction: column;
+        padding: 20px 20px 0;
+
+        .brand {
+            display: flex;
+            width: 100%;
+
+            .mat-form-field {
+                margin-left: 15px;
+            }
+
+            div {
+                margin-left: 15px;
+            }
+
+            .title {
+                margin-left: 0;
+                font-weight: 500;
+                flex: 1;
+            }
+
+            .name {
+                align-self: center;
+                flex: 1;
+                word-break: break-word;
+                margin-left: 0;
+            }
+
+            .volume {
+                text-align: center;
+                width: 145px;
+            }
+
+            .prepayment {
+                text-align: center;
+                width: 215px;
+            }
+
+            .cutoff {
+                text-align: center;
+                width: 185px;
+            }
+        }
+    }
+
+    .planned-params {
+        padding: 0 20px;
+        display: flex;
+        justify-content: space-between;
+
+        .mat-form-field {
+            width: calc(32%);
+        }
+    }
+
+    .columns {
+        position: relative;
+        padding: 0 20px;
+        width: calc(100% - 40px);
+
+        .column {
+            display: flex;
+            flex-direction: column;
+            margin-right: 20px;
+            width: 270px;
+            margin-top: 20px;
+
+            .header {
+                display: flex;
+                text-align: center;
+
+                div {
+                    width: 130px;
+
+                    &:not(:last-of-type) {
+                        margin-right: 15px;
+                    }
+                }
+            }
+
+            .field {
+                display: flex;
+
+                .mat-form-field {
+                    width: 130px;
+                    text-align: center;
+
+                    &:not(:last-of-type) {
+                        margin-right: 15px;
+                    }
+                }
+
+                .delete {
+                    align-self: center;
+
+                    &:hover:not(:disabled) {
+                        background: map-get($seasons-warn, 50);
+                    }
+                }
+            }
+
+            .add {
+                transition: 200ms;
+                margin-left: 120px;
+                background: map-get($seasons-accent, 50);
+
+                &:hover:not(:disabled) {
+                    background: map-get($seasons-accent, 100);
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,37 @@
+@import '~@angular/material/_theming.scss';
+@import 'projects/pim/src/pim-colors.scss';
+
+:host {
+    background-color: white;
+}
+
+.filter {
+    width: 100%;
+    margin: 5px 20px 0 0;
+    align-self: center;
+
+    .mat-chip {
+        min-height: 24px;
+        font-size: 12px;
+        padding: 0 4px 0 10px;
+        margin: 0 0 2px 5px;
+    }
+
+    &.select-attributes {
+        position: relative;
+        width: 300px;
+
+        .mat-select {
+            position: absolute;
+            top: 32px;
+            left: 0;
+            width: 300px;
+            opacity: 0;
+        }
+    }
+
+    &.select-levels {
+        width: 300px;
+        margin-right: 0;
+    }
+}

@@ -1,0 +1,20 @@
+<nav>
+    <div [ngSwitch]="getCurrentModule()">
+        <div class="module" *ngSwitchCase="Module[Module.PIM].toLowerCase()">
+            <div>PIM</div>
+            <button color="accent" mat-button [matMenuTriggerFor]="menu">
+                {{getCurrentSection(Module[Module.PIM])}}
+                <mat-icon color="accent">keyboard_arrow_down</mat-icon>
+            </button>
+            <mat-menu color="accent" #menu="matMenu" [overlapTrigger]="false">
+                <a [routerLink]="['products']" routerLinkActive="active" [style.display]="userService.isSectionAvailable(Module.PIM,PimSectionPermissionsNames[0])?'':'none'"
+                    mat-menu-item>Товары</a>
+                <a [routerLink]="['admin']" routerLinkActive="active" [style.display]="userService.isSectionAvailable(Module.PIM,PimSectionPermissionsNames[1])?'':'none'"
+                    mat-menu-item>Администрирование</a>
+            </mat-menu>
+        </div>
+        <div *ngSwitchDefault>
+        </div>
+
+    </div>
+</nav>

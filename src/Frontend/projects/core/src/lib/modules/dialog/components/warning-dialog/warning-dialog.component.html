@@ -1,0 +1,13 @@
+<div class="warning-dialog-layout">
+    <header>
+        <mat-icon>warning</mat-icon>
+        <div> {{message}}</div>
+    </header>
+    <main>
+        <div>{{info}}</div>
+    </main>
+    <mat-divider></mat-divider>
+    <footer>
+        <button mat-button (click)="closeDialog()">Закрыть</button>
+    </footer>
+</div>

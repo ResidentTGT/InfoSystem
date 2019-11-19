@@ -1,0 +1,20 @@
+<main>
+    <mat-card *ngIf="hasPermission(0)">
+        <a [routerLink]="['discount']">
+            <img src="assets/icons/discount.png" alt="Discount">
+            Сделки
+        </a>
+    </mat-card>
+    <mat-card *ngIf="hasPermission(1)">
+        <a [routerLink]="['netcost']">
+            <img src="assets/icons/netcost.png" alt="Netcost">
+            Landing Cost
+        </a>
+    </mat-card>
+    <mat-card *ngIf="hasPermission(2)">
+        <a [routerLink]="['retail']">
+            <img src="assets/icons/retail.png" alt="Retail">
+            {{CalculatorSectionPermissionsNames[2]}}
+        </a>
+    </mat-card>
+</main>

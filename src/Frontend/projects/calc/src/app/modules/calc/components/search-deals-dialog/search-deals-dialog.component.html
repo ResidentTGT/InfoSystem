@@ -1,0 +1,136 @@
+<div class="search-deals-dialog-layout">
+    <div class="loading" *ngIf="loading">
+        <mat-progress-spinner color="accent" mode="indeterminate" [strokeWidth]="8"></mat-progress-spinner>
+    </div>
+
+    <div class="dialog-content">
+        <header>
+            <mat-icon color="accent">filter_list</mat-icon>
+            <div>Фильтры поиска</div>
+        </header>
+
+        <mat-divider></mat-divider>
+
+        <main>
+            <div class="filters">
+                <mat-form-field>
+                    <mat-select matInput multiple placeholder="Подразделения" [(ngModel)]="searchFilters.departments">
+                        <mat-option *ngFor="let department of departments" [value]="department.id">
+                            {{department.name}}
+                        </mat-option>
+                    </mat-select>
+                    <button mat-button *ngIf="searchFilters.departments.length" matSuffix mat-icon-button aria-label="Сбросить фильтр" (click)="searchFilters.departments=[];$event.stopPropagation();">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-select matInput multiple placeholder="Менеджеры" [(ngModel)]="searchFilters.managers">
+                        <mat-option *ngFor="let manager of managers" [value]="manager.id">
+                            {{manager.displayName}}
+                        </mat-option>
+                    </mat-select>
+                    <button mat-button *ngIf="searchFilters.managers.length" matSuffix mat-icon-button aria-label="Сбросить фильтр" (click)="searchFilters.managers=[];$event.stopPropagation();">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </mat-form-field>
+            </div>
+            <div class="filters">
+                <mat-form-field>
+                    <mat-select matInput multiple placeholder="Бренды" [(ngModel)]="searchFilters.brands">
+                        <mat-option *ngFor="let brand of brands" [value]="brand.id">
+                            {{brand.value}}
+                        </mat-option>
+                    </mat-select>
+                    <button mat-button *ngIf="searchFilters.brands.length" matSuffix mat-icon-button aria-label="Сбросить фильтр" (click)="searchFilters.brands=[];$event.stopPropagation();">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-select matInput multiple placeholder="Сезоны" [(ngModel)]="searchFilters.seasons">
+                        <mat-option *ngFor="let season of seasons" [value]="season.id">
+                            {{season.value}}
+                        </mat-option>
+                    </mat-select>
+                    <button mat-button *ngIf="searchFilters.seasons.length" matSuffix mat-icon-button aria-label="Сбросить фильтр" (click)="searchFilters.seasons=[];$event.stopPropagation();">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </mat-form-field>
+            </div>
+            <div class="filters">
+                <mat-form-field>
+                    <input autocomplete="off" matInput [(ngModel)]="searchFilters.contractor" placeholder="Контрагент">
+                    <button mat-button *ngIf="searchFilters.contractor" matSuffix mat-icon-button aria-label="Сбросить фильтр" (click)="searchFilters.contractor=null;$event.stopPropagation();">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </mat-form-field>
+                <mat-form-field>
+                    <input autocomplete="off" matInput [(ngModel)]="searchFilters.dealId" placeholder="Номер сделки" type="number">
+                    <button mat-button *ngIf="searchFilters.dealId" matSuffix mat-icon-button aria-label="Сбросить фильтр" (click)="searchFilters.dealId=null;$event.stopPropagation();">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </mat-form-field>
+            </div>
+            <div class="filters">
+                <mat-form-field>
+                    <input autocomplete="off" matInput [(ngModel)]="searchFilters.discountFrom" placeholder="Скидка: от" type="number">
+                    <button mat-button *ngIf="searchFilters.discountFrom" matSuffix mat-icon-button aria-label="Сбросить фильтр" (click)="searchFilters.discountFrom=null;$event.stopPropagation();">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </mat-form-field>
+                <mat-form-field>
+                    <input autocomplete="off" matInput [(ngModel)]="searchFilters.discountTo" placeholder="Скидка: до" type="number">
+                    <button mat-button *ngIf="searchFilters.discountTo" matSuffix mat-icon-button aria-label="Сбросить фильтр" (click)="searchFilters.discountTo=null;$event.stopPropagation();">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </mat-form-field>
+            </div>
+            <div class="filters">
+                <mat-form-field (click)="createDateFromPicker.open()">
+                    <input matInput readonly autocomplete="off" [(ngModel)]="searchFilters.createDateFrom" placeholder="Дата создания: от"
+                           [matDatepicker]="createDateFromPicker">
+                    <mat-datepicker-toggle matSuffix [for]="createDateFromPicker"></mat-datepicker-toggle>
+                    <mat-datepicker #createDateFromPicker></mat-datepicker>
+                    <button mat-button *ngIf="searchFilters.createDateFrom" matSuffix mat-icon-button aria-label="Сбросить фильтр" (click)="searchFilters.createDateFrom=null;$event.stopPropagation();">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </mat-form-field>
+                <mat-form-field (click)="createDateToPicker.open()">
+                    <input matInput readonly autocomplete="off" [(ngModel)]="searchFilters.createDateTo" placeholder="Дата создания: до"
+                           [matDatepicker]="createDateToPicker">
+                    <mat-datepicker-toggle matSuffix [for]="createDateToPicker"></mat-datepicker-toggle>
+                    <mat-datepicker #createDateToPicker></mat-datepicker>
+                    <button mat-button *ngIf="searchFilters.createDateTo" matSuffix mat-icon-button aria-label="Сбросить фильтр" (click)="searchFilters.createDateTo=null;$event.stopPropagation();">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </mat-form-field>
+            </div>
+            <div class="filters">
+                <mat-form-field (click)="loadDateFromPicker.open()">
+                    <input matInput readonly autocomplete="off" [(ngModel)]="searchFilters.loadDateFrom" placeholder="Загрузка в 1С: от"
+                           [matDatepicker]="loadDateFromPicker">
+                    <mat-datepicker-toggle matSuffix [for]="loadDateFromPicker"></mat-datepicker-toggle>
+                    <mat-datepicker #loadDateFromPicker></mat-datepicker>
+                    <button mat-button *ngIf="searchFilters.loadDateFrom" matSuffix mat-icon-button aria-label="Сбросить фильтр" (click)="searchFilters.loadDateFrom=null;$event.stopPropagation();">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </mat-form-field>
+                <mat-form-field (click)="loadDateToPicker.open()">
+                    <input matInput readonly autocomplete="off" [(ngModel)]="searchFilters.loadDateTo" placeholder="Загрузка в 1С: до"
+                           [matDatepicker]="loadDateToPicker">
+                    <mat-datepicker-toggle matSuffix [for]="loadDateToPicker"></mat-datepicker-toggle>
+                    <mat-datepicker #loadDateToPicker></mat-datepicker>
+                    <button mat-button *ngIf="searchFilters.loadDateTo" matSuffix mat-icon-button aria-label="Сбросить фильтр" (click)="searchFilters.loadDateTo=null;$event.stopPropagation();">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </mat-form-field>
+            </div>
+        </main>
+
+        <mat-divider></mat-divider>
+
+        <footer>
+            <button mat-flat-button color="primary" (click)="closeDialog(true)">Применить</button>
+            <button mat-flat-button color="warn" (click)="closeDialog()">Отмена</button>
+        </footer>
+    </div>
+</div>

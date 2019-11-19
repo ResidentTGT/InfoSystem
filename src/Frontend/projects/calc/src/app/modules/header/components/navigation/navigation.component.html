@@ -1,0 +1,25 @@
+<nav>
+    <div [ngSwitch]="getCurrentModule()">
+        <div class="module" *ngSwitchCase="Module[Module.Calculator].toLowerCase()">
+            <div>Калькулятор</div>
+            <button color="accent" mat-button [matMenuTriggerFor]="menu">
+                {{getCurrentSection(Module[Module.Calculator])}}
+                <mat-icon color="accent">keyboard_arrow_down</mat-icon>
+            </button>
+            <mat-menu color="accent" #menu="matMenu" [overlapTrigger]="false">
+                <a [routerLink]="['discount']" routerLinkActive="active"
+                    [style.display]="userService.isSectionAvailable(Module.Calculator , CalculatorSectionPermissionsNames[0])?'':'none'"
+                    mat-menu-item>Сделки</a>
+                <a [routerLink]="['netcost']" routerLinkActive="active"
+                    [style.display]="userService.isSectionAvailable(Module.Calculator , CalculatorSectionPermissionsNames[1])?'':'none'"
+                    mat-menu-item>Landing Cost</a>
+                <a [routerLink]="['retail']" routerLinkActive="active"
+                    [style.display]="userService.isSectionAvailable(Module.Calculator , CalculatorSectionPermissionsNames[2])?'':'none'"
+                    mat-menu-item>{{CalculatorSectionPermissionsNames[2]}}</a>
+            </mat-menu>
+        </div>
+        <div *ngSwitchDefault>
+        </div>
+
+    </div>
+</nav>

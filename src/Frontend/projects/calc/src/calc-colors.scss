@@ -1,0 +1,13 @@
+@import '~@angular/material/_theming.scss';
+
+$calc-primary: mat-palette($mat-grey, 800, 700, 500);
+$calc-accent: mat-palette($mat-blue-grey, 700, 500, 300);
+$calc-warn: mat-palette($mat-red, 700, 500, 300);
+
+$calc-background:mat-palette($mat-grey, 100, 300, 500);
+
+@include mat-core();
+
+$calc-theme: mat-light-theme($calc-primary, $calc-accent, $calc-warn);
+
+@include angular-material-theme($calc-theme);

@@ -1,0 +1,50 @@
+@import '~@angular/material/_theming.scss';
+@import 'projects/seasons/src/seasons-colors.scss';
+:host {
+    display: block;
+    height: 64px;
+    z-index: 900;
+    position: relative;
+    @include mat-elevation(1);
+    header {
+        display: flex;
+        height: 100%;
+        justify-content: space-between;
+        background-color: #fafafa;
+        section {
+            display: flex;
+            &.second,
+            &.first {
+                flex: 1;
+            }
+            &.second {
+                justify-content: flex-end;
+            }
+        }
+        .apps-menu {
+            display: flex;
+            align-self: center;
+            width: 45px;
+            height: 45px;
+            justify-content: center;
+            margin-left: 10px;
+            transition: 200ms;
+            background: map-get($seasons-accent, 50);
+            &:hover {
+                background: map-get($seasons-accent, 100);
+            }
+        }
+        .logo {
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            text-decoration: none;
+            flex-shrink: 0;
+            cursor: pointer;
+            img {
+                height: 48px;
+                outline: none;
+            }
+        }
+    }
+}

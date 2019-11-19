@@ -1,0 +1,116 @@
+<aside>
+    <company-categories (withoutCategoryCheckboxed)="searchFilters.withoutCategory=$event;updateFilters()"
+        (categoriesSelected)="searchFilters.selectedCategories=$event;updateFilters()"
+        [changeWithoutCategoryCheckboxed]="searchFilters.withoutCategory"
+        [changeSelectedCategories]="searchFilters.selectedCategories"></company-categories>
+</aside>
+
+<main>
+    <header>
+        <button mat-icon-button class="update-products-button" (click)="updateProducts()">
+            <mat-icon>refresh</mat-icon>
+        </button>
+
+        <company-products-search (searchStringChanged)="searchFilters.searchString=$event;updateFilters()"
+            [changeSearchString]="searchFilters.searchString" [changeViewAttributes]="viewAttributes"
+            [changeSelectedAttributes]="selectedAttributes" (selectedAttributesChanged)="selectedAttributes=$event;"
+            (selectedLevelsChanged)="selectedLevels=$event;" class="company-products-search"></company-products-search>
+
+        <section class="menu">
+            <button mat-icon-button [matMenuTriggerFor]="menu">
+                <mat-icon>menu</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+
+                <button mat-menu-item [matMenuTriggerFor]="import">
+                    <mat-icon>cloud_upload</mat-icon>Импорт
+                </button>
+                <mat-menu #import="matMenu">
+                    <a [routerLink]="['import']"
+                        *ngIf="userService.isSectionAvailable(Module.PIM , PimSectionPermissionsNames[7])"
+                        mat-menu-item>
+                        <mat-icon>shopping_basket</mat-icon>Товары
+                    </a>
+                    <button mat-menu-item>
+                        <input accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" id="gtin"
+                            type="file" class="gtin-input" (change)="loadImportGtin($event.target.files)">
+                        <label for="gtin">
+                            <mat-icon>import_export</mat-icon>GTIN
+                        </label>
+                    </button>
+                </mat-menu>
+
+                <button mat-menu-item [matMenuTriggerFor]="export">
+                    <mat-icon>cloud_download</mat-icon>Экспорт товаров
+                </button>
+                <mat-menu #export="matMenu">
+
+                    <button mat-menu-item [matMenuTriggerFor]="selectedProductsExport"
+                        [disabled]="!selectedProducts.length">
+                        <mat-icon>check_box</mat-icon>Выбранные
+                    </button>
+
+                    <mat-menu #selectedProductsExport="matMenu">
+                        <button mat-menu-item (click)="exportProducts()">
+                            <span>Без шаблона</span>
+                        </button>
+                        <button mat-menu-item (click)="exportGs1()">
+                            <mat-icon>import_export</mat-icon>
+                            <span>Для загрузки в GS1</span>
+                        </button>
+                        <button *ngFor="let category of categories" mat-menu-item (click)="exportProducts(false, category.id)">
+                            <span>{{category.name}}</span>
+                        </button>
+                    </mat-menu>
+
+                    <button mat-menu-item [matMenuTriggerFor]="searchProductsExport">
+                        <mat-icon>youtube_searched_for</mat-icon>По фильтрам поиска
+                    </button>
+
+                    <mat-menu #searchProductsExport="matMenu">
+                        <button mat-menu-item (click)="exportProducts(true)">
+                            <mat-icon>select_all</mat-icon>
+                            <span>Без шаблона</span>
+
+                        </button>
+                        <button mat-menu-item (click)="exportGs1(true)">
+                            <mat-icon>import_export</mat-icon>
+                            <span>Для загрузки в GS1</span>
+                        </button>
+                        <button *ngFor="let category of categories" mat-menu-item
+                            (click)="exportProducts(true, category.id)">
+                            <mat-icon>sort</mat-icon>
+                            <span>{{category.name}}</span>
+
+                        </button>
+                    </mat-menu>
+
+                </mat-menu>
+
+                <button [disabled]="!selectedProducts.length" (click)="editAttributes()" mat-menu-item>
+                    <mat-icon>edit</mat-icon>
+                    <span>Редактировать атрибуты</span>
+                </button>
+
+                <button mat-menu-item (click)="navigateToProductCreate()">
+                    <mat-icon>add</mat-icon>
+                    <span>Добавить новый товар</span>
+                </button>
+                <button [disabled]="!selectedProducts.length" (click)="deleteProducts()" mat-menu-item>
+                    <mat-icon>delete</mat-icon>
+                    <span>Удалить выбранные товары</span>
+                </button>
+            </mat-menu>
+        </section>
+    </header>
+
+    <mat-divider></mat-divider>
+
+    <company-products-view (pageFiltersChanged)="updatePageFilters($event)" [categories]="flatCategories"
+        (productsSelected)="selectedProducts=$event" [productsTotalCount]="productsTotalCount"
+        [changePageNumber]="pageFilters.pageNumber" [changePageSize]="pageFilters.pageSize" [changeSelectedProducts]="selectedProducts"
+        [setAttributesLists]="attributesLists" [changeSelectedAttributes]="selectedAttributes" [products]="products"
+        [changeViewAttributes]="viewAttributes" [changeSelectedLevels]="selectedLevels"
+        [productsLoading]="productsLoading" class="company-products-view">
+    </company-products-view>
+</main>

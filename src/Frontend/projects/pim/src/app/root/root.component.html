@@ -1,0 +1,16 @@
+<company-header *ngIf="userService.user" (appsMenuButtonClicked)="sidenav.toggle()" class="company-header"></company-header>
+
+<main>
+    <ng-container>
+        <mat-sidenav-container class="apps-menu">
+            <mat-sidenav #sidenav mode="over">
+                <a [routerLink]="['']" routerLinkActive="active" [style.display]="userService.isModuleAvailable(Module.PIM)?'':'none'">PIM</a>
+                <a [href]="env.modulesUrls.seasons" [style.display]="userService.isModuleAvailable(Module.Seasons)?'':'none'">Сезоны</a>
+                <a [href]="env.modulesUrls.calculator" [style.display]="userService.isModuleAvailable(Module.Calculator)?'':'none'">Калькулятор</a>
+            </mat-sidenav>
+            <mat-sidenav-content>
+                <router-outlet *ngIf="userService.user"></router-outlet>
+            </mat-sidenav-content>
+        </mat-sidenav-container>
+    </ng-container>
+</main>

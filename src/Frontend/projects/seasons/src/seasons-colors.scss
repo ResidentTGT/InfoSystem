@@ -1,0 +1,13 @@
+@import '~@angular/material/_theming.scss';
+
+$seasons-primary: mat-palette($mat-grey, 800, 700, 500);
+$seasons-accent: mat-palette($mat-blue-grey, 700, 500, 300);
+$seasons-warn: mat-palette($mat-red, 700, 500, 300);
+
+$seasons-background:mat-palette($mat-grey, 100, 300, 500);
+
+@include mat-core();
+
+$seasons-theme: mat-light-theme($seasons-primary, $seasons-accent, $seasons-warn);
+
+@include angular-material-theme($seasons-theme);

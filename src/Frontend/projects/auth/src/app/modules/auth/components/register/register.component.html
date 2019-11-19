@@ -1,0 +1,41 @@
+<div class="loading" *ngIf="loading">
+    <mat-progress-spinner color="primary" mode="indeterminate" [strokeWidth]="8"></mat-progress-spinner>
+</div>
+<form autocomplete="off">
+    <mat-form-field>
+        <input matInput placeholder="Логин" required [formControl]="loginFormControl" [errorStateMatcher]="matcher">
+        <mat-error *ngIf="loginFormControl.hasError('required')">
+            Поле не может быть пустым
+        </mat-error>
+    </mat-form-field>
+
+    <mat-form-field>
+        <input matInput placeholder="Почта" [formControl]="emailFormControl" [errorStateMatcher]="matcher">
+        <mat-error *ngIf="emailFormControl.hasError('email')">
+            Адрес имеет неверный формат
+        </mat-error>
+    </mat-form-field>
+
+    <mat-form-field>
+        <input matInput placeholder="Пароль" required type="password" (change)="checkValidators()" [formControl]="passwordFormControl"
+            [errorStateMatcher]="matcher">
+        <mat-error *ngIf="passwordFormControl.hasError('minlength')">
+            Пароль должен содержать не менее 8 символов
+        </mat-error>
+    </mat-form-field>
+
+    <mat-form-field>
+        <input matInput placeholder="Повторите пароль" (change)="checkValidators()" required type="password" [formControl]="repeatPasswordFormControl"
+            [errorStateMatcher]="matcher">
+        <mat-error>
+            Пароли не совпадают
+        </mat-error>
+    </mat-form-field>
+
+    <button class="register" color="primary" [disabled]="!isValidForm()" mat-flat-button (click)="register()">Зарегистрироваться</button>
+
+    <button class="login" mat-button (click)="login()">Перейти на страницу входа</button>
+
+    <div class="error">{{error}}</div>
+</form>
+<img class="logo" src="../../../../../assets/super_brands_logo_black_round.png" alt="company" />

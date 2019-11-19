@@ -1,0 +1,57 @@
+<div class="dialog-layout">
+    <header>
+        <mat-icon color="primary">create</mat-icon>
+        <div> Заполните контактные данные</div>
+    </header>
+
+    <mat-divider></mat-divider>
+
+    <main [formGroup]="form">
+
+        <mat-form-field class="fullName">
+            <input autocomplete="off" required matInput placeholder="ФИО" formControlName="fullName" [errorStateMatcher]="matcher">
+            <mat-error *ngIf="form.controls['fullName'].hasError('required')">
+                <strong>Необходимо заполнить</strong>
+            </mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="phone">
+            <input autocomplete="off" required matInput placeholder="Контактный телефон" formControlName="phone" [errorStateMatcher]="matcher">
+            <mat-error *ngIf="form.controls['phone'].hasError('required')">
+                <strong>Необходимо заполнить</strong>
+            </mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="mail">
+            <input autocomplete="off" matInput placeholder="Электронная почта" formControlName="email" [errorStateMatcher]="matcher">
+            <mat-error *ngIf="form.controls['email'].hasError('email')">
+                <strong>Введите корректный адрес электронной почты</strong>
+            </mat-error>
+        </mat-form-field>
+
+        <mat-divider></mat-divider>
+        <section class="company">
+            <div>Организация:</div>
+            <mat-form-field class="company-name">
+                <input autocomplete="off" required matInput placeholder="Название организации" formControlName="companyName" [errorStateMatcher]="matcher">
+                <mat-error *ngIf="form.controls['companyName'].hasError('required')">
+                    <strong>Необходимо заполнить</strong>
+                </mat-error>
+            </mat-form-field>
+            <mat-form-field class="tin">
+                <input autocomplete="off" required matInput placeholder="ИНН" formControlName="tin" [errorStateMatcher]="matcher">
+                <mat-error *ngIf="form.controls['tin'].hasError('required')">
+                    <strong>Необходимо заполнить</strong>
+                </mat-error>
+            </mat-form-field>
+        </section>
+
+    </main>
+    <mat-divider></mat-divider>
+
+    <footer>
+        <button mat-button color="primary" (click)="closeDialog()">Закрыть</button>
+        <button mat-raised-button color="primary" (click)="createOrder()" [disabled]="!form.valid">
+            Отправить заявку</button>
+    </footer>
+</div>

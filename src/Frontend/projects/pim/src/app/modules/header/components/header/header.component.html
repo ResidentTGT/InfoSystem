@@ -1,0 +1,16 @@
+<header>
+    <section class="first">
+        <button (click)="openAppsMenu()" color="accent" class="apps-menu" mat-icon-button>
+            <mat-icon>menu</mat-icon>
+        </button>
+        <company-navigation></company-navigation>
+    </section>
+
+    <section class="logo">
+        <img [routerLink]="['/']" src="assets/logo_black_horizontal.png" alt="company" />
+    </section>
+
+    <section class="second">
+        <company-user-menu></company-user-menu>
+    </section>
+</header>

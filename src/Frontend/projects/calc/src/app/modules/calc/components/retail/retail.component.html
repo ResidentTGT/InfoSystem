@@ -1,0 +1,109 @@
+<aside>
+    <div class="loading" *ngIf="productsLoading||listsLoading">
+        <mat-progress-spinner color="accent" mode="indeterminate" [strokeWidth]="8"></mat-progress-spinner>
+    </div>
+
+    <div class="form">
+        <div class="main">
+            <button mat-icon-button class="edit-btn" (click)="editSelectedProducts()" matBadge="{{selection.selected.length}}"
+                matBadgeColor="accent" [disabled]="!selection.hasValue()">
+                <mat-icon>edit</mat-icon>
+            </button>
+            <mat-form-field>
+                <mat-select (selectionChange)="updateBrandSeasonFilter()" [(ngModel)]="brand" placeholder="Бренд">
+                    <mat-option *ngFor="let brand of brandsList.listValues" [value]="brand">{{brand.value}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-select (selectionChange)="updateBrandSeasonFilter()" [(ngModel)]="season" placeholder="Сезон">
+                    <mat-option *ngFor="let season of seasonsList.listValues" [value]="season">{{season.value}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <mat-form-field class="filter">
+            <mat-chip-list #chipList>
+                <mat-chip *ngFor="let str of searchString" [removable]="true" (removed)="removeStr(str)" (click)="clickChip(str, searchStringInput)"
+                    [selected]="str===selectedString">
+                    {{str}}
+                    <mat-icon matChipRemove>cancel</mat-icon>
+                </mat-chip>
+                <input autocomplete="off" #searchStringInput placeholder="Дополнительные фильтры поиска"
+                    [matChipInputFor]="chipList" [matChipInputAddOnBlur]="true" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                    (matChipInputTokenEnd)="addStr($event)" (blur)="clearSearchStringInput($event)" [value]="searchStringValue">
+            </mat-chip-list>
+        </mat-form-field>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <div class="table-container">
+        <table mat-table [dataSource]="dataSource">
+
+            <ng-container matColumnDef="check">
+                <th mat-header-cell class="check" *matHeaderCellDef>
+                    <mat-checkbox color="accent" [checked]="isAllSelected()" (change)="toggleAllSelected($event.checked)"
+                        [disabled]="!dataSource.data.length" [indeterminate]="selection.hasValue() && !isAllSelected()"></mat-checkbox>
+                </th>
+                <td mat-cell class="check" *matCellDef="let product">
+                    <mat-checkbox color="accent" [checked]="selection.isSelected(product)" (change)="toggleSelected(product)"
+                        (click)="$event.stopPropagation()"></mat-checkbox>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="level-1">
+                <th mat-header-cell class="level-1" *matHeaderCellDef></th>
+                <td mat-cell class="level-1" *matCellDef="let product">
+                    <mat-icon *ngIf="product.modelLevel === ModelLevel.ColorModel">subdirectory_arrow_right</mat-icon>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="level-2">
+                <th mat-header-cell class="level-2" *matHeaderCellDef></th>
+                <td mat-cell class="level-2" *matCellDef="let product">
+                    <mat-icon *ngIf="product.modelLevel === ModelLevel.RangeSizeModel">subdirectory_arrow_right</mat-icon>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="sku">
+                <th mat-header-cell class="sku" *matHeaderCellDef>SKU</th>
+                <td mat-cell class="sku" *matCellDef="let product">{{product.sku}}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="name">
+                <th mat-header-cell class="name" *matHeaderCellDef>Товар</th>
+                <td mat-cell class="name" *matCellDef="let product">{{product.name}}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="status">
+                <th mat-header-cell class="status" *matHeaderCellDef>Статус</th>
+                <td mat-cell class="status" *matCellDef="let product">
+                    <mat-icon>{{isExistRrc(product)?'done':'remove'}}</mat-icon>
+                </td>
+            </ng-container>
+
+            <tr class="header" mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row class="product-row" [routerLinkActive]="product.modelLevel === ModelLevel.RangeSizeModel ? 'active' : ''"
+                [routerLink]="product.modelLevel === ModelLevel.RangeSizeModel ? product.id : null"
+                *matRowDef="let product; columns: displayedColumns;"
+                [ngClass]="{
+                    'level-1-tr': product.modelLevel === ModelLevel.ColorModel,
+                    'level-2-tr': product.modelLevel === ModelLevel.RangeSizeModel
+                }">
+            </tr>
+
+        </table>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <footer>
+        <mat-paginator [length]="pageLength" [pageSizeOptions]="pageSizeOptions" (page)="handlePageEvent($event)"></mat-paginator>
+    </footer>
+
+</aside>
+
+<main>
+    <router-outlet></router-outlet>
+</main>

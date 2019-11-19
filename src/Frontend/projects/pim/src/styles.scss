@@ -1,0 +1,33 @@
+/* You can add global styles to this file, and also import other style files */
+
+@import './pim-colors.scss';
+html,
+body {
+    margin: 0;
+    font-family: Roboto, sans-serif;
+    height: 100%;
+    background-color: white;
+    overflow: hidden !important;
+}
+
+.mat-dialog-container {
+    padding: 0 !important;
+}
+
+.mat-snack-bar-container {
+    background: map-get($pim-accent, 800);
+}
+
+::-webkit-scrollbar-thumb {
+    background: map-get($pim-accent, 100);
+}
+
+::-webkit-scrollbar-track {
+    background: map-get($pim-accent, 50);
+}
+
+// For Internet Explorer
+body {
+    scrollbar-face-color: map-get($pim-accent, 100);
+    scrollbar-track-color: map-get($pim-accent, 50);
+}

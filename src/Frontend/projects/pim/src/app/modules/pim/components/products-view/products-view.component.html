@@ -1,0 +1,101 @@
+<div class="table-container" #tableContainer>
+
+    <div class="loading" *ngIf="productsLoading">
+        <mat-progress-spinner color="accent" mode="indeterminate" [strokeWidth]="8"></mat-progress-spinner>
+    </div>
+
+    <table mat-table [dataSource]="dataSource">
+
+        <ng-container matColumnDef="select" sticky>
+            <th mat-header-cell class="checkbox" *matHeaderCellDef>
+                <mat-checkbox color="accent" (change)="$event ? masterToggle() : null"
+                    [checked]="selection.hasValue() && isAllSelected()"
+                    [indeterminate]="selection.hasValue() && !isAllSelected()">
+                </mat-checkbox>
+            </th>
+            <td mat-cell class="checkbox" *matCellDef="let product">
+                <mat-checkbox color="accent" (change)="$event ? selectProduct(product) : null"
+                    (click)="$event.stopPropagation()" [checked]="selection.isSelected(product)">
+                </mat-checkbox>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="level-1" sticky>
+            <th mat-header-cell class="level-1" *matHeaderCellDef></th>
+            <td mat-cell class="level-1" *matCellDef="let product">
+                <mat-icon *ngIf="product.modelLevel === ModelLevel.ColorModel">subdirectory_arrow_right</mat-icon>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="level-2" sticky>
+            <th mat-header-cell class="level-2" *matHeaderCellDef></th>
+            <td mat-cell class="level-2" *matCellDef="let product">
+                <mat-icon *ngIf="product.modelLevel === ModelLevel.RangeSizeModel">subdirectory_arrow_right</mat-icon>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="photo" sticky>
+            <th mat-header-cell *matHeaderCellDef>Фото</th>
+            <td mat-cell class="image" *matCellDef="let product">
+                <div class="image-container" *ngIf="product.modelLevel !== ModelLevel.RangeSizeModel">
+                    <img [src]="product.mainImgId ? backendApiService.FileStorage.getFileSrc(product.mainImgId) : 'assets/no-photo.png'"
+                        alt="Product photo" />
+                </div>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="sku">
+            <th mat-header-cell class="sku" *matHeaderCellDef>SKU</th>
+            <td mat-cell class="sku" *matCellDef="let product">{{product.sku}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="name">
+            <th mat-header-cell class="name" *matHeaderCellDef>Наименование</th>
+            <td mat-cell class="name" *matCellDef="let product">{{product.name}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="category">
+            <th mat-header-cell class="category" *matHeaderCellDef>Категория</th>
+            <td mat-cell class="category" *matCellDef="let product" [ngClass]="{'parent-value': !product.categoryId}">
+                {{getCategoryName(product)}}
+            </td>
+        </ng-container>
+
+        <ng-container *ngFor="let attrColumn of attrDisplayedColumns" [matColumnDef]="attrColumn.columnId">
+            <th mat-header-cell *matHeaderCellDef>
+                <div [matTooltipDisabled]="!isLongString(attrColumn.attribute.name)"
+                    [matTooltip]="attrColumn.attribute.name" [matTooltipShowDelay]="500">
+                    {{getCellName(attrColumn.attribute.name)}}
+                </div>
+            </th>
+            <td mat-cell class="column-attr mat-cell"
+                [ngClass]="{'parent-value': getProductProperty(attrColumn.attribute.id,product)?.isParent}"
+                *matCellDef="let product">
+                {{cutValue(getProductProperty(attrColumn.attribute.id,product)?.originValue)}}
+            </td>
+        </ng-container>
+
+        <tr class="header" mat-header-row *matHeaderRowDef="allDisplayedColumns; sticky: true"></tr>
+        <tr class="product-row" mat-row *matRowDef="let product; columns: allDisplayedColumns;"
+            (click)="openProduct(product)" [ngClass]="{
+                'level-1-tr': product.modelLevel === ModelLevel.ColorModel,
+                'level-2-tr': product.modelLevel === ModelLevel.RangeSizeModel
+            }"></tr>
+
+    </table>
+</div>
+
+<mat-divider></mat-divider>
+
+<footer class="paginator">
+    <div class="selected-products">
+        <div *ngIf="selectedProducts.length">Выбрано товаров: {{getProductsCount(ModelLevel.Model)}} -
+            {{getProductsCount(ModelLevel.ColorModel)}} - {{getProductsCount(ModelLevel.RangeSizeModel)}}</div>
+    </div>
+    <mat-form-field>
+        <input autocomplete="off" min="1" [max]="maxPage" matInput type="number" [(ngModel)]="pageInput"
+            [placeholder]="'Страница, макс.: '+ maxPage" (input)="handlePageInput()" />
+    </mat-form-field>
+    <mat-paginator [length]="pageLength" [pageIndex]="pageIndex" [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions" (page)="handlePageEvent($event)"></mat-paginator>
+</footer>
